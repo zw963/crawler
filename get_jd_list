@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+
+require 'open-uri'
+require 'cgi'
+require 'csv'
+require 'logger'
+require 'nokogiri'
+require 'watir-webdriver'
+
+`mkdir -p ./logs`
+`mkdir -p ./lists`
+
+def keyword
+  @keyword
+end
+
+def keyword=(keyword)
+  @keyword = CGI.escape(keyword)
+end
+
+def product_amount
+  product_amount = Nokogiri::HTML.
+    parse(open("http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8").read)
+    .css('div.total span strong')
+    .text.to_i
+  logger.info "数量: #{product_amount}"
+  product_amount
+end
+
+def page_count(product_amount)
+  per_page_count=(ENV['product_count_per_page'] or 60)
+  puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 $product_count_per_page 改变默认值.' unless ENV['product_count_per_page']
+  page_count = product_amount % per_page_count == 0 ? product_amount.to_i/per_page_count : product_amount.to_i/per_page_count + 1
+  logger.info "需要 #{page_count} 页."
+  page_count
+end
+
+def logger
+  @logger ||= Logger.new("logs/#{ARGV[0]}_列表.log")
+end
+
+puts '使用方法: get_jd_list 分类关键字'
+
+self.keyword = ARGV[0]
+logger.progname = '抓取京东列表'
+logger.info "启动 #{ARGV[0]}_列表 抓取."
+
+csv_file = CSV.open("./#{ARGV[0]}.csv", "wb")
+
+counter = 0
+contents = []
+
+logger.info "正在打开浏览器"
+
+Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
+browser = Watir::Browser.new(:chrome)
+(1..2*page_count(product_amount)-1).step(2).each do |page|
+  url = "http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8#keyword=#{keyword}&enc=utf-8&qr=&qrst=UNEXPAND&qk=title_key%2C%2C#{keyword}&rt=1&stop=1&click=&psort=&page=#{page}"
+  logger.info "打开第 #{page} 页"
+  browser.goto url
+  10.times { browser.send_keys :space; sleep 0.1 }
+  logger.info "保存第 #{page} 结果."
+  contents << browser.html
+  browser.reset!
+end
+logger.info "正在关闭浏览器"
+browser.close
+
+logger.info "正在分析页面结果"
+contents.each do |content|
+  anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
+  anchors.each do |anchor|
+    sku = anchor.attr('sku')
+    FileUtils.mkdir_p("./lists/#{ARGV[0]}/#{sku}")
+
+    name = anchor.css('div.p-name a').inner_html.sub(%r{<font[^<]*class="adwords".*</font>}, '').strip
+    html = "http://item.jd.com/#{sku}.html"
+    picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+    csv_file << [name, html, picture_url]
+    counter += 1
+  end
+end
+logger.info "分析结束, 抓取数量: #{counter}."
+puts "产品数量为 #{product_amount}, 但是抓取结果为: #{counter}."
+
+csv_file.close
