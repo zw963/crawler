@@ -7,9 +7,6 @@ require 'logger'
 require 'nokogiri'
 require 'watir-webdriver'
 
-`mkdir -p ./logs`
-`mkdir -p ./lists`
-
 def keyword
   @keyword
 end
@@ -25,6 +22,10 @@ def product_amount
     .text.to_i
   logger.info "数量: #{product_amount}"
   product_amount
+rescue SocketError, HTTPError, URLError, Net::ReadTimeout
+  logger.error $!.message
+  puts $!.message
+  retry
 end
 
 def page_count(product_amount)
@@ -39,7 +40,13 @@ def logger
   @logger ||= Logger.new("logs/#{ARGV[0]}_列表.log")
 end
 
-puts '使用方法: get_jd_list 分类关键字'
+if ARGV[0].nil?
+  puts '没有指定分类关键字'
+  exit 1
+end
+
+`mkdir -p ./logs`
+`mkdir -p ./lists`
 
 self.keyword = ARGV[0]
 logger.progname = '抓取京东列表'
@@ -47,7 +54,6 @@ logger.info "启动 #{ARGV[0]}_列表 抓取."
 
 csv_file = CSV.open("./#{ARGV[0]}.csv", "wb")
 
-counter = 0
 contents = []
 
 logger.info "正在打开浏览器"
@@ -57,9 +63,16 @@ browser = Watir::Browser.new(:chrome)
 (1..2*page_count(product_amount)-1).step(2).each do |page|
   url = "http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8#keyword=#{keyword}&enc=utf-8&qr=&qrst=UNEXPAND&qk=title_key%2C%2C#{keyword}&rt=1&stop=1&click=&psort=&page=#{page}"
   logger.info "打开第 #{page} 页"
-  browser.goto url
+  begin
+    browser.goto url
+  rescue Net::ReadTimeout
+    logger.error $!.message
+    puts $!.message
+    retry
+  end
   10.times { browser.send_keys :space; sleep 0.1 }
-  logger.info "保存第 #{page} 结果."
+  logger.info "保存第 #{page} 页结果."
+  puts "保存第 #{page} 页结果."
   contents << browser.html
   browser.reset!
 end
@@ -67,6 +80,8 @@ logger.info "正在关闭浏览器"
 browser.close
 
 logger.info "正在分析页面结果"
+
+counter = 0
 contents.each do |content|
   anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
   anchors.each do |anchor|
@@ -76,6 +91,7 @@ contents.each do |content|
     name = anchor.css('div.p-name a').inner_html.sub(%r{<font[^<]*class="adwords".*</font>}, '').strip
     html = "http://item.jd.com/#{sku}.html"
     picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+
     csv_file << [name, html, picture_url]
     counter += 1
   end
