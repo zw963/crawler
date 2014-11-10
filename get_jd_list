@@ -92,7 +92,7 @@ contents.each do |content|
     html = "http://item.jd.com/#{sku}.html"
     picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
 
-    csv_file << [name, html, picture_url]
+    csv_file << [sku, name, html, picture_url]
     counter += 1
   end
 end
