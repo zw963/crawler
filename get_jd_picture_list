@@ -22,26 +22,28 @@ if ARGV[0].nil?
   exit 1
 end
 
+list = CSV.read("jd/#{ARGV[0]}_列表.csv")[0]
+sku = list[0]
+picture_url = list[3]
+name = list[1]
+
+csv_filename = "./jd/#{ARGV[0]}/#{sku}/pictures.csv"
+
+if test 's', csv_filename
+  puts "跳过 #{name} !"
+  exit
+end
+
 begin
-  list = CSV.read("jd/#{ARGV[0]}_列表.csv")[0]
-  sku = list[0]
-  picture_url = list[3]
-  name = list[1]
-
-  csv_filename = "./jd/#{ARGV[0]}/#{sku}/pictures.csv"
-  if test 's', csv_filename
-    puts "跳过 #{name} !"
-    exit
-  end
-
   csv_file = CSV.open(csv_filename, "wb")
-
   browser.goto picture_url
   browser.ul(class: 'list-h').lis.each do |li|
     li.click
     csv_file << [sku, browser.div(id: 'biger').img.src]
   end
 ensure
+  logger.info '正在关闭浏览器'
   browser.close unless @browser.nil?
+  logger.info '正在关闭 csv 文件.'
   csv_file.close unless csv_file.nil?
 end

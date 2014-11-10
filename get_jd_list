@@ -64,20 +64,21 @@ browser = Watir::Browser.new(:chrome)
   url = "http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8#keyword=#{keyword}&enc=utf-8&qr=&qrst=UNEXPAND&qk=title_key%2C%2C#{keyword}&rt=1&stop=1&click=&psort=&page=#{page}"
   logger.info "打开第 #{page} 页"
   begin
+    browser.reset!
     browser.goto url
+    10.times { browser.send_keys :space; sleep 0.1 }
+    logger.info "保存第 #{page} 页结果."
+    puts "保存第 #{page} 页结果."
+    contents << browser.html
   rescue Net::ReadTimeout
     logger.error $!.message
     puts $!.message
     retry
+  ensure
+    logger.info '正在关闭浏览器'
+    browser.close unless @browser.nil?
   end
-  10.times { browser.send_keys :space; sleep 0.1 }
-  logger.info "保存第 #{page} 页结果."
-  puts "保存第 #{page} 页结果."
-  contents << browser.html
-  browser.reset!
 end
-logger.info "正在关闭浏览器"
-browser.close
 
 logger.info "正在分析页面结果"
 
@@ -96,7 +97,9 @@ contents.each do |content|
     counter += 1
   end
 end
+
 logger.info "分析结束, 抓取数量: #{counter}."
 puts "产品数量为 #{product_amount}, 但是抓取结果为: #{counter}."
 
+logger.info '正在关闭 csv 文件.'
 csv_file.close
