@@ -37,7 +37,7 @@ def page_count(product_amount)
 end
 
 def logger
-  @logger ||= Logger.new("logs/#{ARGV[0]}_列表.log")
+  @logger ||= Logger.new("logs/京东_#{ARGV[0]}_列表.log")
 end
 
 if ARGV[0].nil?
@@ -46,13 +46,13 @@ if ARGV[0].nil?
 end
 
 `mkdir -p ./logs`
-`mkdir -p ./lists`
+`mkdir -p ./jd`
 
 self.keyword = ARGV[0]
 logger.progname = '抓取京东列表'
 logger.info "启动 #{ARGV[0]}_列表 抓取."
 
-csv_file = CSV.open("./#{ARGV[0]}.csv", "wb")
+csv_file = CSV.open("./jd/#{ARGV[0]}_列表.csv", "wb")
 
 contents = []
 
@@ -86,7 +86,7 @@ contents.each do |content|
   anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
   anchors.each do |anchor|
     sku = anchor.attr('sku')
-    FileUtils.mkdir_p("./lists/#{ARGV[0]}/#{sku}")
+    FileUtils.mkdir_p("./jd/#{ARGV[0]}/#{sku}")
 
     name = anchor.css('div.p-name a').inner_html.sub(%r{<font[^<]*class="adwords".*</font>}, '').strip
     html = "http://item.jd.com/#{sku}.html"
