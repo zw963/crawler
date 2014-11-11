@@ -16,27 +16,32 @@ def browser
   @browser ||= Watir::Browser.new(:chrome)
 end
 
+unless ARGV.empty?
+  puts "无需提供参数, 请先使用 \033[0;33m./get_jd_list #{ARGV.join(' ')}\033[0m 生成抓取列表."
+  exit 1
+end
+
 begin
   logger.info "正在打开浏览器"
 
   Dir['./jd/*.csv'].each do |file|
-    file_name = File.basename(file, '.csv')
+    list_csv_filename = File.basename(file, '.csv')
 
     list = CSV.read(file).each do |csv_array|
       sku = csv_array[0]
       picture_url = csv_array[3]
       name = csv_array[1]
 
-      picture_csv = "./jd/#{file_name}/#{sku}/pictures.csv"
+      picture_csv_filename = "./jd/#{list_csv_filename}/#{sku}/pictures.csv"
 
-      if test 's', picture_csv
+      if test 's', picture_csv_filename
         puts "跳过 #{name} !"
         next
       end
 
       begin
-        logger.info "创建 #{picture_csv}"
-        csv = CSV.open(picture_csv, "wb")
+        logger.info "创建 #{picture_csv_filename}"
+        csv_file = CSV.open(picture_csv_filename, "wb")
         browser.reset!
         logger.info "打开 #{picture_url}"
         browser.goto picture_url
@@ -44,11 +49,11 @@ begin
         browser.ul(class: 'list-h').lis.each.with_index do |li, i|
           li.click
           logger.info "导入第 #{i+1} 张图片 URL."
-          csv << [sku, browser.div(id: 'biger').img.src]
+          csv_file << [sku, browser.div(id: 'biger').img.src]
         end
       ensure
         logger.info '正在关闭 csv 文件.'
-        csv.close
+        csv_file.close
       end
     end
   end

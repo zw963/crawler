@@ -20,7 +20,7 @@ def product_amount
     parse(open("http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8").read)
     .css('div.total span strong')
     .text.to_i
-  logger.info "数量: #{product_amount}"
+  logger.info "产品数量: #{product_amount}"
   product_amount
 rescue SocketError, HTTPError, URLError, Net::ReadTimeout
   logger.error $!.message
@@ -37,69 +37,75 @@ def page_count(product_amount)
 end
 
 def logger
-  @logger ||= Logger.new("logs/京东_#{ARGV[0]}_列表.log")
+  @logger ||= Logger.new("log/京东_#{ARGV[0]}_列表.log")
+end
+
+def browser
+  Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
+  @browser ||= Watir::Browser.new(:chrome)
 end
 
 if ARGV[0].nil?
-  puts '没有指定分类关键字'
+  puts "必须指定分类关键字, 例如: #{$0} 蒙牛."
   exit 1
 end
 
-`mkdir -p ./logs`
+`mkdir -p ./log`
 `mkdir -p ./jd`
 
 self.keyword = ARGV[0]
 logger.progname = '抓取京东列表'
-logger.info "启动 #{ARGV[0]}_列表 抓取."
+logger.info "\n\n启动 #{ARGV[0]}_列表 抓取."
 
-csv_file = CSV.open("./jd/#{ARGV[0]}_列表.csv", "wb")
-
-contents = []
-
-logger.info "正在打开浏览器"
-
-Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-browser = Watir::Browser.new(:chrome)
-(1..2*page_count(product_amount)-1).step(2).each do |page|
-  url = "http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8#keyword=#{keyword}&enc=utf-8&qr=&qrst=UNEXPAND&qk=title_key%2C%2C#{keyword}&rt=1&stop=1&click=&psort=&page=#{page}"
-  logger.info "打开第 #{page} 页"
-  begin
-    browser.reset!
-    browser.goto url
-    10.times { browser.send_keys :space; sleep 0.1 }
-    logger.info "保存第 #{page} 页结果."
-    puts "保存第 #{page} 页结果."
-    contents << browser.html
-  rescue Net::ReadTimeout
-    logger.error $!.message
-    puts $!.message
-    retry
-  ensure
-    logger.info '正在关闭浏览器'
-    browser.close unless @browser.nil?
+begin
+  contents = []
+  logger.info "正在打开浏览器"
+  (1..2*page_count(product_amount)-1).step(2).each do |page|
+    url = "http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8#keyword=#{keyword}&enc=utf-8&qr=&qrst=UNEXPAND&qk=title_key%2C%2C#{keyword}&rt=1&stop=1&click=&psort=&page=#{page}"
+    logger.info "正在打开第 #{page} 页"
+    begin
+      browser.reset!
+      browser.goto url
+      10.times { browser.send_keys :space; sleep 0.1 }
+      contents << browser.html
+      logger.info "保存第 #{page} 页结果到内存."
+    rescue Net::ReadTimeout
+      logger.error $!.message
+      puts $!.message
+      retry
+    end
   end
+ensure
+  logger.info '正在关闭浏览器'
+  browser.close unless @browser.nil?
 end
 
-logger.info "正在分析页面结果"
+logger.info "开始分析页面结果"
+begin
+  csv_filename = "./jd/#{ARGV[0]}.csv"
+  logger.info "创建 #{csv_filename}"
 
-counter = 0
-contents.each do |content|
-  anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
-  anchors.each do |anchor|
-    sku = anchor.attr('sku')
-    FileUtils.mkdir_p("./jd/#{ARGV[0]}/#{sku}")
+  csv_file = CSV.open(csv_filename, "wb")
 
-    name = anchor.css('div.p-name a').inner_html.sub(%r{<font[^<]*class="adwords".*</font>}, '').strip
-    html = "http://item.jd.com/#{sku}.html"
-    picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+  counter = 0
+  contents.each do |content|
+    anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
+    anchors.each do |anchor|
+      sku = anchor.attr('sku')
+      FileUtils.mkdir_p("./jd/#{ARGV[0]}/#{sku}")
 
-    csv_file << [sku, name, html, picture_url]
-    counter += 1
+      name = anchor.css('div.p-name a').inner_html.sub(%r{<font[^<]*class="adwords".*</font>}, '').strip
+      html = "http://item.jd.com/#{sku}.html"
+      picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+
+      logger.info "正在插入第 #{counter+1} 条记录"
+      csv_file << [sku, name, html, picture_url]
+      counter += 1
+    end
   end
+  logger.info "分析结束, 抓取数量: #{counter}."
+  puts "产品数量为 #{product_amount}, 但是抓取数量为: #{counter}." unless product_amount == counter
+ensure
+  logger.info '正在关闭 csv 文件.'
+  csv_file.close
 end
-
-logger.info "分析结束, 抓取数量: #{counter}."
-puts "产品数量为 #{product_amount}, 但是抓取结果为: #{counter}."
-
-logger.info '正在关闭 csv 文件.'
-csv_file.close
