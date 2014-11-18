@@ -78,7 +78,7 @@ require_relative 'common'
 include Common
 
 unless test 's', './keywords.txt'
-  puts '分类关键字文件 keyword.txt 不存在或者为空, 请首先编辑该文件.'
+  puts '分类关键字文件 keywords.txt 不存在或者为空, 请首先编辑该文件.'
   exit
 end
 
