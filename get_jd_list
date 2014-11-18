@@ -22,28 +22,23 @@ def page_count(product_amount)
 end
 
 def capture
-  begin
-    contents = []
+  contents = []
 
-    logger.info "正在打开浏览器"
-    (1..2*page_count(product_amount)-1).step(2).each do |page|
-      url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
-      logger.info "正在打开第 #{page} 页"
-      begin
-        browser.reset!
-        browser.goto url
-        10.times { browser.send_keys :space; sleep 0.1 }
-        contents << browser.html
-        logger.info "保存第 #{page} 页结果到内存."
-      rescue Net::ReadTimeout
-        logger.error $!.message
-        puts $!.message
-        retry
-      end
+  logger.info "正在打开浏览器"
+  (1..2*page_count(product_amount)-1).step(2).each do |page|
+    url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
+    logger.info "正在打开第 #{page} 页"
+    begin
+      browser.reset!
+      browser.goto url
+      10.times { browser.send_keys :space; sleep 0.1 }
+      contents << browser.html
+      logger.info "保存第 #{page} 页结果到内存."
+    rescue Net::ReadTimeout
+      logger.error $!.message
+      puts $!.message
+      retry
     end
-  ensure
-    logger.info '正在关闭浏览器'
-    browser.close unless @browser.nil?
   end
 
   logger.info "开始分析页面结果"
@@ -82,7 +77,12 @@ unless test 's', './keywords.txt'
   exit
 end
 
-File.foreach('keywords.txt') do |keyword|
-  self.keyword = keyword.chomp
-  capture
+begin
+  File.foreach('keywords.txt') do |keyword|
+    self.keyword = keyword.chomp
+    capture
+  end
+ensure
+  logger.info '正在关闭浏览器'
+  browser.close unless @browser.nil?
 end
