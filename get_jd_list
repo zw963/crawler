@@ -1,23 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'open-uri'
-require 'cgi'
-require 'csv'
-require 'logger'
-require 'nokogiri'
-require 'watir-webdriver'
-
-def keyword
-  @keyword
-end
-
-def keyword=(keyword)
-  @keyword = CGI.escape(keyword)
-end
-
 def product_amount
   product_amount = Nokogiri::HTML.
-    parse(open("http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8").read)
+    parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
     .css('div.total span strong')
     .text.to_i
   logger.info "产品数量: #{product_amount}"
@@ -36,32 +21,22 @@ def page_count(product_amount)
   page_count
 end
 
-def logger
-  @logger ||= Logger.new("log/京东_#{ARGV[0]}_列表.log")
-end
+require_relative 'common'
+include Common
 
-def browser
-  Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-  @browser ||= Watir::Browser.new(:chrome)
-end
+self.keyword = ARGV[0]
 
-if ARGV[0].nil?
+if keyword.nil?
   puts "必须指定分类关键字, 例如: #{$0} 蒙牛."
   exit 1
 end
 
-`mkdir -p ./log`
-`mkdir -p ./jd`
-
-self.keyword = ARGV[0]
-logger.progname = '抓取京东列表'
-logger.info "\n\n启动 #{ARGV[0]}_列表 抓取."
-
 begin
   contents = []
+
   logger.info "正在打开浏览器"
   (1..2*page_count(product_amount)-1).step(2).each do |page|
-    url = "http://search.jd.com/Search?keyword=#{keyword}&enc=utf-8#keyword=#{keyword}&enc=utf-8&qr=&qrst=UNEXPAND&qk=title_key%2C%2C#{keyword}&rt=1&stop=1&click=&psort=&page=#{page}"
+    url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
     logger.info "正在打开第 #{page} 页"
     begin
       browser.reset!
@@ -82,9 +57,6 @@ end
 
 logger.info "开始分析页面结果"
 begin
-  csv_filename = "./jd/#{ARGV[0]}.csv"
-  logger.info "创建 #{csv_filename}"
-
   csv_file = CSV.open(csv_filename, "wb")
 
   counter = 0
@@ -92,9 +64,9 @@ begin
     anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
     anchors.each do |anchor|
       sku = anchor.attr('sku')
-      FileUtils.mkdir_p("./jd/#{ARGV[0]}/#{sku}")
+      FileUtils.mkdir_p("./#{site}/#{keyword}/#{sku}")
 
-      name = anchor.css('div.p-name a').inner_html.sub(%r{<font[^<]*class="adwords".*</font>}, '').strip
+      name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
       html = "http://item.jd.com/#{sku}.html"
       picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
 

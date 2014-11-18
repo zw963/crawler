@@ -1,38 +1,24 @@
 #!/usr/bin/env ruby
 
-require 'open-uri'
-require 'cgi'
-require 'csv'
-require 'logger'
-require 'nokogiri'
-require 'watir-webdriver'
-
-def logger
-  @logger ||= Logger.new("log/京东_#{ARGV[0]}_图片.log")
-end
-
-def browser
-  Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-  @browser ||= Watir::Browser.new(:chrome)
-end
-
 unless ARGV.empty?
   puts "无需提供参数, 请先使用 \033[0;33m./get_jd_list #{ARGV.join(' ')}\033[0m 生成抓取列表."
   exit 1
 end
 
-begin
-  logger.info "正在打开浏览器"
+require_relative 'common'
+include Common
 
-  Dir['./jd/*.csv'].each do |file|
-    list_csv_filename = File.basename(file, '.csv')
+begin
+  Dir["./#{site}/*.csv"].each do |file|
+    self.keyword = File.basename(file, '.csv')
+    logger.info "正在打开 #{keyword} 图片页面."
 
     list = CSV.read(file).each do |csv_array|
       sku = csv_array[0]
       picture_url = csv_array[3]
       name = csv_array[1]
 
-      picture_csv_filename = "./jd/#{list_csv_filename}/#{sku}/pictures.csv"
+      picture_csv_filename = "./#{site}/#{keyword}/#{sku}/pictures.csv"
 
       if test 's', picture_csv_filename
         puts "跳过 #{name} !"
@@ -41,7 +27,7 @@ begin
 
       begin
         logger.info "创建 #{picture_csv_filename}"
-        csv_file = CSV.open(picture_csv_filename, "wb")
+        picture_csv_file = CSV.open(picture_csv_filename, "wb")
         browser.reset!
         logger.info "打开 #{picture_url}"
         browser.goto picture_url
@@ -49,11 +35,11 @@ begin
         browser.ul(class: 'list-h').lis.each.with_index do |li, i|
           li.click
           logger.info "导入第 #{i+1} 张图片 URL."
-          csv_file << [sku, browser.div(id: 'biger').img.src]
+          picture_csv_file << [sku, browser.div(id: 'biger').img.src]
         end
       ensure
         logger.info '正在关闭 csv 文件.'
-        csv_file.close
+        picture_csv_file.close
       end
     end
   end
