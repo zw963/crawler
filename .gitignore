@@ -1,5 +1,5 @@
 *.csv
-/logs/*
+/log
 /vendor
 /.bundle
 /lists

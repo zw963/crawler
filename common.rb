@@ -10,6 +10,11 @@ module Common
   attr_accessor :keyword
 
   def browser
+    unless ENV['CHROME_PATH']
+      puts '没有设定 $CHROME_PATH 环境变量!'
+      exit
+    end
+
     Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
     @browser ||= Watir::Browser.new(:chrome)
   end
