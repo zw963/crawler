@@ -21,63 +21,68 @@ def page_count(product_amount)
   page_count
 end
 
+def capture
+  begin
+    contents = []
+
+    logger.info "正在打开浏览器"
+    (1..2*page_count(product_amount)-1).step(2).each do |page|
+      url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
+      logger.info "正在打开第 #{page} 页"
+      begin
+        browser.reset!
+        browser.goto url
+        10.times { browser.send_keys :space; sleep 0.1 }
+        contents << browser.html
+        logger.info "保存第 #{page} 页结果到内存."
+      rescue Net::ReadTimeout
+        logger.error $!.message
+        puts $!.message
+        retry
+      end
+    end
+  ensure
+    logger.info '正在关闭浏览器'
+    browser.close unless @browser.nil?
+  end
+
+  logger.info "开始分析页面结果"
+  begin
+    csv_file = CSV.open(csv_filename, "wb")
+
+    counter = 0
+    contents.each do |content|
+      anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
+      anchors.each do |anchor|
+        sku = anchor.attr('sku')
+        FileUtils.mkdir_p("./#{site}/#{keyword}/#{sku}")
+
+        name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
+        html = "http://item.jd.com/#{sku}.html"
+        picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+
+        logger.info "正在插入第 #{counter+1} 条记录"
+        csv_file << [sku, name, html, picture_url]
+        counter += 1
+      end
+    end
+    logger.info "分析结束, 抓取数量: #{counter}."
+    puts "产品数量为 #{product_amount}, 抓取数量为: #{counter}."
+  ensure
+    logger.info '正在关闭 csv 文件.'
+    csv_file.close
+  end
+end
+
 require_relative 'common'
 include Common
 
-self.keyword = ARGV[0]
-
-if keyword.nil?
-  puts "必须指定分类关键字, 例如: #{$0} 蒙牛."
-  exit 1
+unless test 's', './keyword.txt'
+  puts '分类关键字文件 keyword.txt 不存在或者为空, 请首先编辑该文件.'
+  exit
 end
 
-begin
-  contents = []
-
-  logger.info "正在打开浏览器"
-  (1..2*page_count(product_amount)-1).step(2).each do |page|
-    url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
-    logger.info "正在打开第 #{page} 页"
-    begin
-      browser.reset!
-      browser.goto url
-      10.times { browser.send_keys :space; sleep 0.1 }
-      contents << browser.html
-      logger.info "保存第 #{page} 页结果到内存."
-    rescue Net::ReadTimeout
-      logger.error $!.message
-      puts $!.message
-      retry
-    end
-  end
-ensure
-  logger.info '正在关闭浏览器'
-  browser.close unless @browser.nil?
-end
-
-logger.info "开始分析页面结果"
-begin
-  csv_file = CSV.open(csv_filename, "wb")
-
-  counter = 0
-  contents.each do |content|
-    anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
-    anchors.each do |anchor|
-      sku = anchor.attr('sku')
-      FileUtils.mkdir_p("./#{site}/#{keyword}/#{sku}")
-
-      name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
-      html = "http://item.jd.com/#{sku}.html"
-      picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
-
-      logger.info "正在插入第 #{counter+1} 条记录"
-      csv_file << [sku, name, html, picture_url]
-      counter += 1
-    end
-  end
-  logger.info "分析结束, 抓取数量: #{counter}."
-  puts "产品数量为 #{product_amount}, 但是抓取数量为: #{counter}." unless product_amount == counter
-ensure
-  logger.info '正在关闭 csv 文件.'
-  csv_file.close
+File.foreach('keyword.txt') do |keyword|
+  self.keyword = keyword.chomp
+  capture
 end
