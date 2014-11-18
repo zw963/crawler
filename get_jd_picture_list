@@ -27,7 +27,7 @@ def capture
           browser.ul(class: 'list-h').lis.each.with_index do |li, i|
             li.click
             logger.info "导入第 #{i+1} 张图片 URL."
-            picture_csv_file << [sku, browser.div(id: 'biger').img.src]
+            picture_csv_file << [browser.div(id: 'biger').img.src]
           end
         ensure
           logger.info '正在关闭 csv 文件.'

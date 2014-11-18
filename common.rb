@@ -4,6 +4,7 @@ require 'csv'
 require 'logger'
 require 'nokogiri'
 require 'watir-webdriver'
+require 'uri'
 
 module Common
   attr_accessor :keyword

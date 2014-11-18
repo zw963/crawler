@@ -77,12 +77,12 @@ end
 require_relative 'common'
 include Common
 
-unless test 's', './keyword.txt'
+unless test 's', './keywords.txt'
   puts '分类关键字文件 keyword.txt 不存在或者为空, 请首先编辑该文件.'
   exit
 end
 
-File.foreach('keyword.txt') do |keyword|
+File.foreach('keywords.txt') do |keyword|
   self.keyword = keyword.chomp
   capture
 end

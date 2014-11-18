@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require_relative 'common'
+include Common
+
+Dir["./#{site}/**/pictures.csv"].each_slice(20) do |filenames|
+  filenames.each do |filename|
+    dirname = File.dirname(filename)
+    pic_urls = File.readlines(filename).map(&:chomp).join(' ')
+    spawn("wget -t5 -P #{dirname} #{pic_urls}")
+  end
+  sleep 10
+end
