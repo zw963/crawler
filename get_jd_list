@@ -8,16 +8,16 @@ def product_amount
   logger.info "#{keyword} 数量: #{product_amount}"
 
   if product_amount == 0
-    logger "#{keyword} 数量为 0, 取消抓取."
+    logger.info "#{keyword} 数量为 0, 取消抓取."
     puts "#{keyword} 数量为 0, 取消抓取."
     throw :exit_capture
   end
 
   product_amount
-# rescue SocketError, HTTPError, URLError, Net::ReadTimeout
-#   logger.error $!.message
-#   puts $!.message
-#   retry
+rescue SocketError, HTTPError, URLError, Net::ReadTimeout
+  logger.error $!.message
+  puts $!.message
+  retry
 end
 
 def page_count(product_amount)
@@ -60,11 +60,11 @@ def capture
         FileUtils.mkdir_p("./#{site}/#{keyword}/#{sku}")
 
         name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
-        html = "http://item.jd.com/#{sku}.html"
-        picture_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+        detail_page_url = "http://item.jd.com/#{sku}.html"
+        picture_page_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
 
         logger.info "正在插入第 #{counter+1} 条记录"
-        csv_file << [sku, name, html, picture_url]
+        csv_file << [sku, name, detail_page_url, picture_page_url]
         counter += 1
       end
     end

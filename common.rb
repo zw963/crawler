@@ -32,18 +32,21 @@ module Common
   end
 
   def logger
-    if @logger
-      @logger
-    else
-      fail '不存在抓取关键字!' if keyword.nil?
+    fail '不存在抓取关键字!' if keyword.nil?
 
+    iv = instance_variable_get(:"@#{keyword}_logger")
+
+    if iv
+      iv
+    else
       FileUtils.mkdir_p("log/#{keyword}")
       tag_filename = "log/#{keyword}/#{tags.join('_')}.log"
 
-      @logger = Logger.new(tag_filename)
-      @logger.progname = "抓取#{tags.join}\n\n"
-      @logger.info "启动 $tag_filename 抓取."
-      @logger
+      iv = Logger.new(tag_filename)
+      iv.progname = "抓取#{tags.join}\n\n"
+      iv.info "启动 #{tag_filename} 抓取."
+      instance_variable_set(:"@#{keyword}_logger", iv)
+      iv
     end
   end
 
