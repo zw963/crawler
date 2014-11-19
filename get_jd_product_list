@@ -86,7 +86,10 @@ def capture
   puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}."
 ensure
   logger.info '正在关闭 csv 文件.'
-  csv_file.close unless csv_file.nil?
+  unless csv_file.nil?
+    csv_file.close
+    File.delete(csv_file.path) if File.zero?(csv_file.path)
+  end
 end
 
 require_relative 'common'

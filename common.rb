@@ -22,6 +22,7 @@ module Common
   def hash_map
     {
       'jd' => '京东',
+      'product' => '产品',
       'picture' => '图片',
       'list' => '列表'
     }
