@@ -47,17 +47,13 @@ module Common
     end
   end
 
-  def csv_filename
-    if @csv_filename
-      @csv_filename
-    else
-      fail '不存在抓取关键字!' if keyword.nil?
+  def keyword_csv_filename
+    fail '不存在抓取关键字!' if keyword.nil?
 
-      FileUtils.mkdir_p(site)
-      @csv_filename = "#{site}/#{keyword}.csv"
-      logger.info "正在创建 #{@csv_filename}"
-      @csv_filename
-    end
+    FileUtils.mkdir_p(site)
+    @csv_filename = "#{site}/#{keyword}.csv"
+    logger.info "正在创建 #{@csv_filename}"
+    @csv_filename
   end
 
   def site

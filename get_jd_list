@@ -43,7 +43,7 @@ def capture
 
   logger.info "开始分析页面结果"
   begin
-    csv_file = CSV.open(csv_filename, "wb")
+    csv_file = CSV.open(keyword_csv_filename, "wb")
 
     counter = 0
     contents.each do |content|
