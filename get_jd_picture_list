@@ -38,8 +38,10 @@ def capture
       end
     end
     # 真实的 sku 数量, 产品页面可能很多, 但是大量的产品页面, 其实是同样的产品 sku 以及图片.
-    logger.info "实际产品数量: #{sku_count}"
-    puts "实际产品数量: #{sku_count}"
+    if sku_count != 0
+      logger.info "实际产品数量: #{sku_count}"
+      puts "实际产品数量: #{sku_count}"
+    end
   end
 end
 
