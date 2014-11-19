@@ -2,6 +2,9 @@
 
 def capture
   Dir["./#{site}/*.csv"].each do |file|
+    self.keyword = File.basename(file, '.csv')
+    sku_count = 0
+
     logger.info "正在打开 #{keyword} 图片页面."
 
     list = CSV.read(file).each do |csv_array|
@@ -31,8 +34,12 @@ def capture
       ensure
         logger.info '正在关闭 csv 文件.'
         picture_csv_file.close
+        sku_count += 1
       end
     end
+    # 真实的 sku 数量, 产品页面可能很多, 但是大量的产品页面, 其实是同样的产品 sku 以及图片.
+    logger.info "实际产品数量: #{sku_count}"
+    puts "实际产品数量: #{sku_count}"
   end
 end
 
@@ -45,10 +52,7 @@ require_relative 'common'
 include Common
 
 begin
-  Dir["./#{site}/*.csv"].each do |file|
-    self.keyword = File.basename(file, '.csv')
-    capture
-  end
+  capture
 ensure
   logger.info '正在关闭浏览器'
   browser.close unless @browser.nil?
