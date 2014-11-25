@@ -31,6 +31,8 @@ def capture
           logger.info "导入第 #{i+1} 张图片 URL."
           picture_csv_file << [browser.div(id: 'biger').img.src]
         end
+      rescue Watir::Exception::UnknownObjectException
+        retry
       ensure
         logger.info '正在关闭 csv 文件.'
         picture_csv_file.close
