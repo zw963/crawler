@@ -44,11 +44,38 @@ module Common
       tag_filename = "log/#{keyword}/#{tags.join('_')}.log"
 
       iv = Logger.new(tag_filename)
-      iv.progname = "抓取#{tags.join}\n\n"
-      iv.info "启动 #{tag_filename} 抓取."
+      iv.progname = "#{tags.join}"
+      iv.info "\n\n" + '*'*100 + "\n启动 #{tag_filename} 抓取.\n" + '*'*100 + "\n"
       instance_variable_set(:"@#{keyword}_logger", iv)
       iv
     end
+  end
+
+  def product_amount
+    iv = instance_variable_get(:"@#{keyword}_amount")
+
+    if iv
+      iv
+    else
+      iv = Nokogiri::HTML.
+        parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
+        .css('div.total span strong')
+        .text.to_i
+      logger.info "关键字: #{keyword}, 数量: #{iv}"
+
+      if iv == 0
+        logger.info "#{keyword} 数量为 0, 取消抓取."
+        puts "#{keyword} 数量为 0, 取消抓取."
+        throw :exit_capture
+      end
+
+      instance_variable_set(:"@#{keyword}_amount", iv)
+      iv
+    end
+  rescue SocketError, HTTPError, URLError, Net::ReadTimeout
+    logger.error $!.message
+    puts $!.message
+    retry
   end
 
   def site

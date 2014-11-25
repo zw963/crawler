@@ -1,25 +1,5 @@
 #!/usr/bin/env ruby
 
-def product_amount
-  product_amount = Nokogiri::HTML.
-    parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
-    .css('div.total span strong')
-    .text.to_i
-  logger.info "#{keyword} 数量: #{product_amount}"
-
-  if product_amount == 0
-    logger.info "#{keyword} 数量为 0, 取消抓取."
-    puts "#{keyword} 数量为 0, 取消抓取."
-    throw :exit_capture
-  end
-
-  product_amount
-rescue SocketError, HTTPError, URLError, Net::ReadTimeout
-  logger.error $!.message
-  puts $!.message
-  retry
-end
-
 def page_count(product_amount)
   per_page_count=(ENV['product_count_per_page'] or 60)
   puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 $product_count_per_page 改变默认值.' unless ENV['product_count_per_page']
@@ -83,10 +63,10 @@ def capture
     end
   end
   logger.info "分析结束, #{keyword} 抓取数量: #{counter}."
-  puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}."
+  puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}." unless product_amount == counter
 ensure
-  logger.info '正在关闭 csv 文件.'
   unless csv_file.nil?
+    logger.info '正在关闭 csv 文件.'
     csv_file.close
     File.delete(csv_file.path) if File.zero?(csv_file.path)
   end
