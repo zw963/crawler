@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
+
+Encoding::default_internal = 'utf-8'
+
+def capture
+  Dir["./#{site}/*.csv"].each do |file|
+    self.keyword = File.basename(file, '.csv')
+
+    logger.info "正在打开 #{keyword} 详细页面."
+
+    list = CSV.read(file).each do |csv_array|
+      sku = csv_array[0]
+      name = csv_array[1]
+      detail_url = csv_array[2]
+
+      csv_filename = "./#{site}/#{keyword}/#{sku}/details.json"
+
+      if test 's', csv_filename
+        puts "跳过 #{name} 细节抓取 !"
+        next
+      end
+
+      begin
+        logger.info "创建 #{csv_filename}"
+        json_file = File.open(csv_filename, "wb")
+        content = Nokogiri::HTML.parse(open(detail_url).read)
+        logger.info "正在抓取 #{name} 细节信息."
+        product_introduction = content.css('div#product-detail-1 ul.detail-list li')
+        details_hash = Hash[product_introduction.map {|e| e.text.split('：') }].to_json
+        json_file.puts "{details: #{details_hash}}"
+        # 重构 logger_with_puts
+        logger.info "已抓取 #{name} 详细信息."
+        puts "已抓取 #{name} 详细信息."
+      ensure
+        logger.info '正在关闭 csv 文件.'
+        json_file.close
+      end
+    end
+  end
+end
+
+unless ARGV.empty?
+  puts "无需提供参数, 请先使用 \033[0;33m./get_jd_list #{ARGV.join(' ')}\033[0m 生成抓取列表."
+  exit 1
+end
+
+require_relative 'common'
+include Common
+
+begin
+  capture
+ensure
+  # 这里应该确保正确的关闭 nokogiri
+end
