@@ -28,8 +28,10 @@ def capture
         logger.info "正在抓取 #{name} 细节信息."
         product_introduction = content.css('div#product-detail-1 ul.detail-list li')
         details_hash = Hash[product_introduction.map {|e| e.text.split('：') }].to_json
-        json_file.puts "{details: #{details_hash}}"
-        # 重构 logger_with_puts
+        specification = content.css('div#product-detail-2 table.Ptable tr')
+        spec_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }].to_json
+        json_file.puts "{\"#{sku}\": {\"details\": #{details_hash}, \"specification\": #{spec_hash}}}"
+        # 重构为一个方法
         logger.info "已抓取 #{name} 详细信息."
         puts "已抓取 #{name} 详细信息."
       ensure
@@ -48,8 +50,4 @@ end
 require_relative 'common'
 include Common
 
-begin
-  capture
-ensure
-  # 这里应该确保正确的关闭 nokogiri
-end
+capture
