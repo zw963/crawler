@@ -1,5 +1,6 @@
 #!/bin/sh
 
 ./get_jd_product_list
+./get_jd_product_detail
 ./get_jd_picture_list
 ./get_jd_picture_downloader
