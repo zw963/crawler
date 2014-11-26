@@ -11,13 +11,15 @@ module Common
   attr_accessor :keyword
 
   def browser
-    unless ENV['CHROME_PATH']
-      logger_with_puts '没有设定 $CHROME_PATH 环境变量!', :error
-      exit
-    end
+    return @browser if @browser
 
-    Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-    @browser ||= Watir::Browser.new(:chrome)
+    if ENV['CHROME_PATH']
+      Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
+      @browser = Watir::Browser.new(:chrome)
+    else
+      logger_with_puts '没有设定 $CHROME_PATH 环境变量, 使用默认驱动 Firefox. (Chrome 会快很多!)', :error
+      @browser = Watir::Browser.new
+    end
   end
 
   def hash_map
