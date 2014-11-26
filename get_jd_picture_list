@@ -3,7 +3,7 @@
 def capture
   Dir["./#{site}/*.csv"].each do |file|
     self.keyword = File.basename(file, '.csv')
-    sku_count = 0
+    picture_count = 0
 
     logger.info "正在打开 #{keyword} 图片页面."
 
@@ -15,40 +15,37 @@ def capture
       picture_csv_filename = "./#{site}/#{keyword}/#{sku}/pictures.csv"
 
       if test 's', picture_csv_filename
-        puts "跳过 #{name} 图片抓取 !"
+        logger_with_puts "跳过 #{name} 图片抓取 !"
         next
       end
 
+      logger.info "创建 #{picture_csv_filename}"
+      logger.info "正在打开 #{picture_url}"
       begin
-        logger.info "创建 #{picture_csv_filename}"
         picture_csv_file = CSV.open(picture_csv_filename, "wb")
         browser.reset!
-        logger.info "打开 #{picture_url}"
         browser.goto picture_url
 
         browser.ul(class: 'list-h').lis.each.with_index do |li, i|
           li.click
-          logger.info "导入第 #{i+1} 张图片 URL."
           picture_csv_file << [browser.div(id: 'biger').img.src]
+          picture_count += 1
         end
-      rescue Watir::Exception::UnknownObjectException
+        logger_with_puts "已抓取 #{name} #{category}#{task}信息."
+      rescue Watir::Exception::UnknownObjectException, Net::ReadTimeout
+        logger.info "尝试重新打开 #{picture_url}"
         retry
       ensure
-        logger.info '正在关闭 csv 文件.'
+        logger.info "正在关闭 #{picture_csv_file.path}"
         picture_csv_file.close
-        sku_count += 1
       end
     end
-    # 真实的 sku 数量, 产品页面可能很多, 但是大量的产品页面, 其实是同样的产品 sku 以及图片.
-    if sku_count != 0
-      logger.info "实际产品数量: #{sku_count}"
-      puts "实际产品数量: #{sku_count}"
-    end
+    logger_with_puts "抓取图片数量: #{picture_count}"
   end
 end
 
 unless ARGV.empty?
-  puts "无需提供参数, 请先使用 \033[0;33m./get_jd_list #{ARGV.join(' ')}\033[0m 生成抓取列表."
+  logger_with_puts logger_with_puts "必须首先使用 \033[0;33m./get_jd_product_list\033[0m 生成抓取列表."
   exit 1
 end
 

@@ -12,7 +12,7 @@ module Common
 
   def browser
     unless ENV['CHROME_PATH']
-      puts '没有设定 $CHROME_PATH 环境变量!'
+      logger_with_puts '没有设定 $CHROME_PATH 环境变量!', :error
       exit
     end
 
@@ -25,6 +25,7 @@ module Common
       'jd' => '京东',
       'product' => '产品',
       'picture' => '图片',
+      'detail' => '详细',
       'list' => '列表'
     }
   end
@@ -65,8 +66,7 @@ module Common
       logger.info "关键字: #{keyword}, 数量: #{iv}"
 
       if iv == 0
-        logger.info "#{keyword} 数量为 0, 取消抓取."
-        puts "#{keyword} 数量为 0, 取消抓取."
+        logger_with_puts "#{keyword} 数量为 0, 取消抓取."
         throw :exit_capture
       end
 
@@ -74,13 +74,25 @@ module Common
       iv
     end
   rescue SocketError, HTTPError, URLError, Net::ReadTimeout
-    logger.error $!.message
-    puts $!.message
+    logger_with_puts $!.message, :error
     retry
   end
 
   def site
     tags[0]
+  end
+
+  def category
+    tags[1]
+  end
+
+  def task
+    tags[2]
+  end
+
+  def logger_with_puts(message, level=:info)
+    logger.send(level, message)
+    puts message
   end
 
   private
