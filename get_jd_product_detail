@@ -14,16 +14,16 @@ def capture
       name = csv_array[1]
       detail_url = csv_array[2]
 
-      csv_filename = "./#{site}/#{keyword}/#{sku}/details.json"
+      json_filename = "./#{site}/#{keyword}/#{sku}/details.json"
 
-      if test 's', csv_filename
-        puts "跳过 #{name} 细节抓取 !"
+      if test 's', json_filename
+        puts "跳过 #{name} 详细页面抓取 !"
         next
       end
 
       begin
-        logger.info "创建 #{csv_filename}"
-        json_file = File.open(csv_filename, "wb")
+        logger.info "创建 #{json_filename}"
+        json_file = File.open(json_filename, "wb")
         content = Nokogiri::HTML.parse(open(detail_url).read)
         logger.info "正在抓取 #{name} 细节信息."
         details = content.css('div#product-detail-1 ul.detail-list li')
@@ -35,7 +35,7 @@ def capture
         logger.info "已抓取 #{name} 详细信息."
         puts "已抓取 #{name} 详细信息."
       ensure
-        logger.info '正在关闭 csv 文件.'
+        logger.info '正在关闭 json 文件.'
         json_file.close
       end
     end

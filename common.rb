@@ -5,6 +5,7 @@ require 'logger'
 require 'nokogiri'
 require 'watir-webdriver'
 require 'uri'
+require 'json'
 
 module Common
   attr_accessor :keyword
