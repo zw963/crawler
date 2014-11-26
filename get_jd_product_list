@@ -47,6 +47,7 @@ def capture
 
   logger.info "开始分析页面结果"
   counter = 0
+  logger_with_puts "开始抓取 #{keyword} #{category}#{task}信息."
   contents.each do |content|
     anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
     anchors.each do |anchor|

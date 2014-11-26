@@ -6,20 +6,13 @@ require 'nokogiri'
 require 'watir-webdriver'
 require 'uri'
 require 'json'
+require_relative 'browser'
 
 module Common
   attr_accessor :keyword
 
   def browser
-    return @browser if @browser
-
-    if ENV['CHROME_PATH']
-      Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-      @browser = Watir::Browser.new(:chrome)
-    else
-      logger_with_puts '没有设定 $CHROME_PATH 环境变量, 使用默认驱动 Firefox. (Chrome 会快很多!)', :error
-      @browser = Watir::Browser.new
-    end
+    @browser ||= ::Browser.new.browser
   end
 
   def hash_map
