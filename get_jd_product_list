@@ -82,6 +82,9 @@ end
 begin
   File.foreach('keywords.txt') do |keyword|
     self.keyword = keyword.chomp
+
+    next if self.keyword.empty?
+
     catch(:exit_capture) { capture }
   end
 ensure
