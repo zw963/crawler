@@ -4,7 +4,7 @@
 Encoding::default_internal = 'utf-8'
 
 def capture
-  Dir["./#{site}/*.csv"].each do |file|
+  Dir["#{__dir__}/#{site}/*.csv"].each do |file|
     self.keyword = File.basename(file, '.csv')
 
     logger.info "正在打开 #{keyword} #{category}页面."
@@ -14,7 +14,7 @@ def capture
       name = csv_array[1]
       detail_url = csv_array[2]
 
-      json_filename = "./#{site}/#{keyword}/#{sku}/details.json"
+      json_filename = "#{__dir__}/#{site}/#{keyword}/#{sku}/details.json"
 
       if test 's', json_filename
         logger_with_puts "跳过 #{name} #{category}页面抓取 !"

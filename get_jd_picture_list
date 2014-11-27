@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 def capture
-  Dir["./#{site}/*.csv"].each do |file|
+  Dir["#{__dir__}/#{site}/*.csv"].each do |file|
     self.keyword = File.basename(file, '.csv')
     picture_count = 0
 
@@ -12,7 +12,7 @@ def capture
       name = csv_array[1]
       picture_url = csv_array[3]
 
-      picture_csv_filename = "./#{site}/#{keyword}/#{sku}/pictures.csv"
+      picture_csv_filename = "#{__dir__}/#{site}/#{keyword}/#{sku}/pictures.csv"
 
       if test 's', picture_csv_filename
         logger_with_puts "跳过 #{name} 图片抓取 !"

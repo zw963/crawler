@@ -3,7 +3,7 @@
 require_relative 'common'
 include Common
 
-Dir["./#{site}/**/pictures.csv"].each_slice(20) do |filenames|
+Dir["#{__dir__}/#{site}/**/pictures.csv"].each_slice(20) do |filenames|
   filenames.each do |filename|
     dirname = File.dirname(filename)
     pic_urls = File.readlines(filename).map(&:chomp).join(' ')

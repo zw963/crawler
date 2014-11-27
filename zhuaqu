@@ -1,6 +1,8 @@
 #!/bin/sh
 
-./get_jd_product_list
-./get_jd_product_detail
-./get_jd_picture_list
-./get_jd_picture_downloader
+SCRIPT_DIRECTORY=$(dirname `which $0`)
+
+$SCRIPT_DIRECTORY/get_jd_product_list
+$SCRIPT_DIRECTORY/get_jd_product_detail
+$SCRIPT_DIRECTORY/get_jd_picture_list
+$SCRIPT_DIRECTORY/get_jd_picture_downloader

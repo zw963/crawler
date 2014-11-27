@@ -24,12 +24,12 @@ module Common
   end
 
   def log_name
-    FileUtils.mkdir_p("log/#{keyword}")
-    "log/#{keyword}/#{tags.join('_')}.log"
+    FileUtils.mkdir_p("#{__dir__}/log/#{keyword}")
+    "#{__dir__}/log/#{keyword}/#{tags.join('_')}.log"
   end
 
   def browser
-    @browser ||= Browser.browser(keyword, true)
+    @browser ||= Browser.browser(keyword)
   end
 
   def hash_map
