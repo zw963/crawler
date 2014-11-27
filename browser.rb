@@ -1,11 +1,16 @@
 class Browser
-  def initialize(non_headless=ENV['NON_HEADLESS'])
+  def initialize(keyword, non_headless=ENV['NON_HEADLESS'])
+    fail '启动 browser 需要首先指定 keyword!' if keyword.nil?
+    @keyword = keyword
+
     return if non_headless
 
     require 'headless'
     @headless = Headless.new
     @headless.start
   ensure
+    logger_with_puts "正在打开浏览器"
+
     if ENV['CHROME_PATH']
       Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
       @browser = Watir::Browser.new(:chrome)

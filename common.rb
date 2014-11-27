@@ -11,8 +11,12 @@ require_relative 'keyword_logger'
 module Common
   attr_accessor :keyword
 
+  def keyword_output
+    "\033[0;33m#{@keyword}\033[0m"
+  end
+
   def browser
-    @browser ||= Browser.new(true).browser
+    @browser ||= Browser.new(keyword, true).browser
   end
 
   def hash_map
@@ -37,31 +41,6 @@ module Common
     else
       instance_variable_set(:"@#{keyword}_logger", KeywordLogger.new(keyword).logger)
     end
-  end
-
-  def product_amount
-    iv = instance_variable_get(:"@#{keyword}_amount")
-
-    if iv
-      iv
-    else
-      iv = Nokogiri::HTML.
-        parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
-        .css('div.total span strong')
-        .text.to_i
-      logger.info "关键字: #{keyword}, 页面报告数量: #{iv}"
-
-      if iv == 0
-        logger_with_puts "#{keyword} 数量为 0, 取消抓取."
-        throw :exit_capture
-      end
-
-      instance_variable_set(:"@#{keyword}_amount", iv)
-      iv
-    end
-  rescue SocketError, HTTPError, URLError, Net::ReadTimeout
-    logger_with_puts $!.message, :error
-    retry
   end
 
   def site

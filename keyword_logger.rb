@@ -2,7 +2,7 @@ require 'logger'
 
 class KeywordLogger
   def initialize(keyword)
-    fail '不存在抓取关键字!' if keyword.nil?
+    fail '启动 logger 需要首先指定 keyword!' if keyword.nil?
 
     FileUtils.mkdir_p("log/#{keyword}")
     tag_filename = "log/#{keyword}/#{tags.join('_')}.log"
