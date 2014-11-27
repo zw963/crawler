@@ -34,12 +34,12 @@ module Common
   end
 
   def logger
-    iv = instance_variable_get(:"@#{keyword}_logger")
+    logger = eval("$#{keyword}_logger")
 
-    if iv
-      iv
+    if logger
+      logger
     else
-      instance_variable_set(:"@#{keyword}_logger", KeywordLogger.logger(keyword))
+      eval("$#{keyword}_logger = KeywordLogger.logger(keyword)")
     end
   end
 
