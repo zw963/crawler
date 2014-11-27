@@ -4,7 +4,7 @@ def page_count(product_amount)
   per_page_count=(ENV['product_count_per_page'] or 60)
   logger_with_puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 $product_count_per_page 改变默认值.' unless ENV['product_count_per_page']
   page_count = product_amount % per_page_count == 0 ? product_amount.to_i/per_page_count : product_amount.to_i/per_page_count + 1
-  logger.info "需要 #{page_count} 页."
+  logger.info "按照每页#{ENV['product_count_per_page'] or 60}计算, 需要 #{page_count} 页."
   page_count
 end
 
@@ -37,7 +37,7 @@ def capture
       browser.goto url
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
-      logger.info "保存第 #{page} 页结果到内存."
+      logger.info "收集第 #{page} 页结果."
     rescue Net::ReadTimeout
       logger.error $!.message
       logger_with_puts $!.message, :error
@@ -47,7 +47,7 @@ def capture
 
   logger.info "开始分析页面结果"
   counter = 0
-  logger_with_puts "开始抓取 #{keyword} #{category}#{task}信息."
+  logger_with_puts "开始抓取 #{keyword} #{category}#{task}."
   contents.each do |content|
     anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
     anchors.each do |anchor|
@@ -61,7 +61,7 @@ def capture
       csv_file << [sku, name, detail_page_url, picture_page_url]
       counter += 1
     end
-    logger_with_puts "已抓取 #{keyword} #{category}#{task}信息."
+    logger_with_puts "已抓取 #{keyword} #{category}#{task}."
   end
   logger_with_puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}."
 ensure

@@ -58,7 +58,7 @@ module Common
         parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
         .css('div.total span strong')
         .text.to_i
-      logger.info "关键字: #{keyword}, 数量: #{iv}"
+      logger.info "关键字: #{keyword}, 页面报告数量: #{iv}"
 
       if iv == 0
         logger_with_puts "#{keyword} 数量为 0, 取消抓取."
