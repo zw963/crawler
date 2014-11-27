@@ -37,15 +37,14 @@ def capture
       browser.goto url
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
-      logger.info "收集第 #{page} 页结果."
+      logger.info "正在收集第 #{page} 页结果."
     rescue Net::ReadTimeout
-      logger.error $!.message
       logger_with_puts $!.message, :error
       retry
     end
   end
 
-  logger.info "开始分析页面结果"
+  logger_with_puts "开始对页面结果进行分析."
   counter = 0
   logger_with_puts "开始抓取 #{keyword} #{category}#{task}."
   contents.each do |content|
@@ -58,10 +57,11 @@ def capture
       detail_page_url = "http://item.jd.com/#{sku}.html"
       picture_page_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
 
+      logger.info "正在插入第 #{counter+1} 条记录"
       csv_file << [sku, name, detail_page_url, picture_page_url]
       counter += 1
     end
-    logger_with_puts "已抓取 #{keyword} #{category}#{task}."
+    logger_with_puts "抓取完成."
   end
   logger_with_puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}."
 ensure
@@ -83,12 +83,9 @@ end
 begin
   File.foreach('keywords.txt') do |keyword|
     self.keyword = keyword.chomp
-
     next if self.keyword.empty?
-
     catch(:exit_capture) { capture }
   end
 ensure
-  logger.info '正在关闭浏览器'
   browser.close unless @browser.nil?
 end

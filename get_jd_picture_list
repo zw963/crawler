@@ -31,7 +31,7 @@ def capture
           picture_csv_file << [browser.div(id: 'biger').img.src]
           picture_count += 1
         end
-        logger_with_puts "已抓取 #{name} #{category}#{task}信息."
+        logger_with_puts "已抓取 #{name} #{category}#{task}."
       rescue Watir::Exception::UnknownObjectException, Net::ReadTimeout
         logger.info "尝试重新打开 #{picture_url}"
         retry
@@ -42,6 +42,9 @@ def capture
     end
     logger_with_puts "抓取图片数量: #{picture_count}"
   end
+ensure
+  logger_with_puts '正在关闭浏览器'
+  browser.close unless @browser.nil?
 end
 
 unless ARGV.empty?
@@ -52,9 +55,4 @@ end
 require_relative 'common'
 include Common
 
-begin
-  capture
-ensure
-  logger.info '正在关闭浏览器'
-  browser.close unless @browser.nil?
-end
+capture

@@ -30,7 +30,7 @@ def capture
         specs = content.css('div#product-detail-2 table.Ptable tr')
         specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }].to_json rescue "{}"
         json_file.puts "{\"#{sku}\": {\"details\": #{details_hash}, \"specification\": #{specs_hash}}}"
-        logger_with_puts "已抓取 #{name} #{category}#{task}信息."
+        logger_with_puts "已抓取 #{name} #{category}#{task}."
       ensure
         logger.info "正在关闭 #{json_file.path}"
         json_file.close

@@ -12,7 +12,7 @@ module Common
   attr_accessor :keyword
 
   def browser
-    @browser ||= ::Browser.new.browser
+    @browser ||= Browser.new(true).browser
   end
 
   def hash_map
@@ -20,23 +20,23 @@ module Common
       'jd' => '京东',
       'product' => '产品',
       'picture' => '图片',
-      'detail' => '详细',
+      'detail' => '信息',
       'list' => '列表'
     }
   end
 
   def keyword_url
-    CGI.escape(@keyword)
+    CGI.escape(keyword)
   end
 
   def logger
-    fail '不存在抓取关键字!' if keyword.nil?
-
     iv = instance_variable_get(:"@#{keyword}_logger")
 
     if iv
       iv
     else
+      fail '不存在抓取关键字!' if keyword.nil?
+
       FileUtils.mkdir_p("log/#{keyword}")
       tag_filename = "log/#{keyword}/#{tags.join('_')}.log"
 

@@ -5,7 +5,7 @@ class Browser
     require 'headless'
     @headless = Headless.new
     @headless.start
-  ensure LoadError
+  ensure
     if ENV['CHROME_PATH']
       Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
       @browser = Watir::Browser.new(:chrome)
@@ -15,12 +15,9 @@ class Browser
     end
   end
 
-  def browser
-    @browser
-  end
-
   def close
-    @browser.close
-    @headless.destroy
+    logger_with_puts '正在关闭浏览器'
+    @browser.close unless @browser.nil?
+    @headless.destroy unless @headless.nil?
   end
 end
