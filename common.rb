@@ -16,7 +16,7 @@ module Common
   end
 
   def browser
-    @browser ||= Browser.new(keyword, true).browser
+    @browser ||= Browser.browser(keyword, true)
   end
 
   def hash_map
@@ -39,7 +39,7 @@ module Common
     if iv
       iv
     else
-      instance_variable_set(:"@#{keyword}_logger", KeywordLogger.new(keyword).logger)
+      instance_variable_set(:"@#{keyword}_logger", KeywordLogger.logger(keyword))
     end
   end
 
