@@ -7,7 +7,6 @@ class KeywordLogger
     FileUtils.mkdir_p("log/#{keyword}")
     tag_filename = "log/#{keyword}/#{tags.join('_')}.log"
 
-
     logger = Logger.new(tag_filename)
     logger.progname = "#{tags.join}"
     logger.info "\n\n" + '*'*100 + "\n启动 #{tag_filename} 抓取.\n" + '*'*100 + "\n"

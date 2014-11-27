@@ -105,11 +105,11 @@ unless test 's', './keywords.txt'
 end
 
 begin
-  File.foreach('keywords.txt') do |keyword|
-    self.keyword = keyword.chomp
-    next if self.keyword.empty?
+  File.foreach('keywords.txt').map(&:chomp).reject {|x| x.empty? }.each do |keyword|
+    self.keyword = keyword
     catch(:exit_capture) { capture }
   end
 ensure
+  logger_with_puts '正在关闭浏览器'
   browser.close unless @browser.nil?
 end
