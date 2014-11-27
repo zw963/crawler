@@ -26,12 +26,15 @@ def capture
         browser.reset!
         browser.goto picture_url
 
+        count = 0
         browser.ul(class: 'list-h').lis.each.with_index do |li, i|
           li.click
           picture_csv_file << [browser.div(id: 'biger').img.src]
           picture_count += 1
+          count += 1
+          logger.info "插入第 #{count} 张图片 url."
         end
-        logger_with_puts "已抓取 #{name} #{category}#{task}."
+        logger_with_puts "#{label(name)} 抓取完成."
       rescue Watir::Exception::UnknownObjectException, Net::ReadTimeout
         logger.info "尝试重新打开 #{picture_url}"
         retry

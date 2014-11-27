@@ -2,7 +2,7 @@
 
 def page_count(product_amount)
   per_page_count=(ENV['product_count_per_page'] or 60)
-  logger_with_puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 $product_count_per_page 改变默认值.' unless ENV['product_count_per_page']
+  logger.info '单页结果的数量使用默认值 60'
   page_count = product_amount % per_page_count == 0 ? product_amount.to_i/per_page_count : product_amount.to_i/per_page_count + 1
   logger.info "按照每页 #{ENV['product_count_per_page'] or 60} 计算, 总共需要 #{page_count} 页."
   page_count
@@ -18,17 +18,17 @@ def product_amount
       parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
       .css('div.total span strong')
       .text.to_i
-    logger.info "关键字: #{keyword_output}, 页面报告数量: #{iv}"
+    logger.info "关键字: #{keyword}, 页面报告数量: #{iv}"
 
     if iv == 0
-      logger_with_puts "#{keyword_output} 数量为 0, 取消抓取."
+      logger_with_puts "#{keyword} 数量为 0, 取消抓取."
       throw :exit_capture
     end
 
     instance_variable_set(:"@#{keyword}_amount", iv)
     iv
   end
-rescue SocketError, HTTPError, URLError, Net::ReadTimeout
+rescue SocketError, URLError, Net::ReadTimeout
   logger_with_puts $!.message, :error
   retry
 end
@@ -44,7 +44,7 @@ def keyword_csv_filename
   end
 
   FileUtils.mkdir_p(site)
-  logger.info "打开 \033[0;33m#{keyword_csv_filename}\033[0m"
+  logger.info "打开 #{keyword_csv_filename}"
 
   keyword_csv_filename
 end
@@ -55,7 +55,7 @@ def capture
 
   (1..2*page_count(product_amount)-1).step(2).each do |page|
     url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
-    logger.info "正在打开第 #{page} 页"
+    logger.info "正在打开第 #{page} 页."
     begin
       browser.reset!
       browser.goto url
@@ -70,7 +70,6 @@ def capture
 
   logger_with_puts "开始对页面结果进行分析."
   counter = 0
-  logger_with_puts "开始抓取 #{keyword_output} #{category}#{task}."
   contents.each do |content|
     anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
     anchors.each do |anchor|
@@ -81,13 +80,13 @@ def capture
       detail_page_url = "http://item.jd.com/#{sku}.html"
       picture_page_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
 
-      logger.info "正在插入第 #{counter+1} 条记录"
       csv_file << [sku, name, detail_page_url, picture_page_url]
       counter += 1
+      logger.info "插入第 #{counter} 条记录."
     end
-    logger_with_puts "#{keyword_output} #{category}#{task} 抓取完成."
+    logger_with_puts "#{label(keyword)} 抓取完成."
   end
-  logger_with_puts "#{keyword_output} 数量为 #{product_amount}, 抓取数量为: #{counter}."
+  logger_with_puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}."
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."
@@ -104,6 +103,7 @@ unless test 's', './keywords.txt'
   exit
 end
 
+puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 $product_count_per_page 改变默认值.'
 begin
   File.foreach('keywords.txt').map(&:chomp).reject {|x| x.empty? }.each do |keyword|
     self.keyword = keyword

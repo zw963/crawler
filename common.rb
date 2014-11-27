@@ -11,8 +11,21 @@ require_relative 'keyword_logger'
 module Common
   attr_accessor :keyword
 
+  def keyword_url
+    CGI.escape(keyword)
+  end
+
   def keyword_output
-    "\033[0;33m#{@keyword}\033[0m"
+    "\033[0;33m#{keyword}\033[0m"
+  end
+
+  def label(keyword=name)
+    "\033[0;31m#{keyword}\033[0m #{category}#{task}"
+  end
+
+  def log_name
+    FileUtils.mkdir_p("log/#{keyword}")
+    "log/#{keyword}/#{tags.join('_')}.log"
   end
 
   def browser
@@ -27,10 +40,6 @@ module Common
       'detail' => '信息',
       'list' => '列表'
     }
-  end
-
-  def keyword_url
-    CGI.escape(keyword)
   end
 
   def logger
