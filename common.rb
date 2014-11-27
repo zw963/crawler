@@ -1,12 +1,12 @@
 require 'open-uri'
 require 'cgi'
 require 'csv'
-require 'logger'
 require 'nokogiri'
 require 'watir-webdriver'
 require 'uri'
 require 'json'
 require_relative 'browser'
+require_relative 'keyword_logger'
 
 module Common
   attr_accessor :keyword
@@ -35,16 +35,7 @@ module Common
     if iv
       iv
     else
-      fail '不存在抓取关键字!' if keyword.nil?
-
-      FileUtils.mkdir_p("log/#{keyword}")
-      tag_filename = "log/#{keyword}/#{tags.join('_')}.log"
-
-      iv = Logger.new(tag_filename)
-      iv.progname = "#{tags.join}"
-      iv.info "\n\n" + '*'*100 + "\n启动 #{tag_filename} 抓取.\n" + '*'*100 + "\n"
-      instance_variable_set(:"@#{keyword}_logger", iv)
-      iv
+      instance_variable_set(:"@#{keyword}_logger", KeywordLogger.new(keyword).logger)
     end
   end
 

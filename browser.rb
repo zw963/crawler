@@ -15,6 +15,10 @@ class Browser
     end
   end
 
+  def browser
+    @browser
+  end
+
   def close
     logger_with_puts '正在关闭浏览器'
     @browser.close unless @browser.nil?
