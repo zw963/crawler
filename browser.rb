@@ -9,8 +9,6 @@ class Browser
     @headless = Headless.new
     @headless.start
   ensure
-    logger_with_puts "正在打开浏览器"
-
     if ENV['CHROME_PATH']
       Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
       browser = Watir::Browser.new(:chrome)
@@ -18,6 +16,7 @@ class Browser
       puts '没有设定 $CHROME_PATH 环境变量, 使用默认驱动 Firefox. (Chrome 会快很多!)'
       browser = Watir::Browser.new
     end
+    logger_with_puts "启动浏览器成功."
 
     return browser
   end

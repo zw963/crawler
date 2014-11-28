@@ -4,7 +4,7 @@ def page_count(product_amount)
   per_page_count=(ENV['product_count_per_page'] or 60)
   logger.info '单页结果的数量使用默认值 60'
   page_count = product_amount % per_page_count == 0 ? product_amount.to_i/per_page_count : product_amount.to_i/per_page_count + 1
-  logger.info "按照每页 #{ENV['product_count_per_page'] or 60} 计算, 总共需要 #{page_count} 页."
+  logger_with_puts "按照每页 #{ENV['product_count_per_page'] or 60} 计算, 总共需要 #{page_count} 页."
   page_count
 end
 
@@ -18,7 +18,7 @@ def product_amount
       parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
       .css('div.total span strong')
       .text.to_i
-    logger.info "关键字: #{keyword}, 页面报告数量: #{iv}"
+    logger_with_puts "关键字: #{keyword}, 页面报告数量: #{iv}"
 
     if iv == 0
       logger_with_puts "#{keyword} 数量为 0, 取消抓取."
@@ -61,14 +61,14 @@ def capture
       browser.goto url
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
-      logger.info "正在收集第 #{page} 页结果."
+      logger_with_puts "正在收集第 #{page} 页结果."
     rescue Net::ReadTimeout
       logger_with_puts $!.message, :error
       retry
     end
   end
 
-  logger_with_puts "开始对页面结果进行分析."
+  logger_with_puts "收集完成, 开始对页面结果进行分析."
   counter = 0
   contents.each do |content|
     anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
