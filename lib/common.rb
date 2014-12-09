@@ -11,7 +11,7 @@ require_relative 'keyword_logger'
 module Common
   attr_accessor :keyword
 
-  def keyword_url
+  def escaped_keyword
     CGI.escape(keyword)
   end
 
@@ -45,6 +45,16 @@ module Common
       'detail' => '信息',
       'list' => '列表'
     }
+  end
+
+  def search_page_url
+    case site
+    when '京东'
+      "http://search.jd.com/Search?keyword=#{escaped_keyword}&enc=utf-8"
+    else
+      logger_with_puts '不存在对应的搜索页面 url, 退出...'
+      exit
+    end
   end
 
   def logger

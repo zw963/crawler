@@ -15,7 +15,7 @@ def product_amount
     iv
   else
     iv = Nokogiri::HTML.
-      parse(open("http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8").read)
+      parse(open(search_page_url).read)
       .css('div.total span strong')
       .text.to_i
     logger_with_puts "关键字: #{keyword}, 页面报告数量: #{iv}"
@@ -28,7 +28,7 @@ def product_amount
     instance_variable_set(:"@#{keyword}_amount", iv)
     iv
   end
-rescue SocketError, URLError, Net::ReadTimeout
+rescue SocketError, Net::ReadTimeout
   logger_with_puts $!.message, :error
   retry
 end
@@ -54,11 +54,10 @@ def capture
   contents = []
 
   (1..2*page_count(product_amount)-1).step(2).each do |page|
-    url = "http://search.jd.com/Search?keyword=#{keyword_url}&enc=utf-8"
     logger.info "正在打开第 #{page} 页."
     begin
       browser.reset!
-      browser.goto url
+      browser.goto search_page_url
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
       logger_with_puts "正在收集第 #{page} 页结果."
@@ -109,6 +108,7 @@ puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 
 begin
   File.foreach(keywords_filename).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
     self.keyword = keyword
+
     catch(:exit_capture) { capture }
   end
 ensure
