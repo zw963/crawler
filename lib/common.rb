@@ -30,7 +30,7 @@ module Common
   end
 
   def home_directory
-    "#{__dir__}/.."
+    File.expand_path("#{__dir__}/..")
   end
 
   def browser
