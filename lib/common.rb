@@ -40,6 +40,7 @@ module Common
   def hash_map
     {
       'jd' => '京东',
+      'tm' => '天猫',
       'product' => '产品',
       'picture' => '图片',
       'detail' => '信息',
@@ -51,6 +52,8 @@ module Common
     case site
     when '京东'
       "http://search.jd.com/Search?keyword=#{escaped_keyword}&enc=utf-8"
+    when '天猫'
+      "http://list.tmall.com/search_product.htm?q=#{escaped_keyword}"
     else
       logger_with_puts '不存在对应的搜索页面 url, 退出...'
       exit
