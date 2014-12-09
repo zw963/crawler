@@ -24,7 +24,7 @@ module Common
   end
 
   def log_name
-    log_name = File.expand_path("../../log/#{keyword}/#{tags.join('_')}.log", $0)
+    log_name = "#{__dir__}/../log/#{keyword}/#{tags.join('_')}.log"
     FileUtils.mkdir_p(File.dirname(log_name))
     log_name
   end
