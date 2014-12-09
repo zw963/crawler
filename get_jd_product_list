@@ -97,7 +97,7 @@ end
 
 keywords_filename = "#{__dir__}/keywords.txt"
 
-require_relative 'common'
+require_relative 'lib/common'
 include Common
 
 unless test 's', keywords_filename

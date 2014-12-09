@@ -55,7 +55,7 @@ unless ARGV.empty?
   exit 1
 end
 
-require_relative 'common'
+require_relative 'lib/common'
 include Common
 
 capture

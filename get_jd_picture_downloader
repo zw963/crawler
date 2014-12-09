@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative 'common'
+require_relative 'lib/common'
 include Common
 
 Dir["#{__dir__}/#{site}/**/pictures.csv"].each_slice(20) do |filenames|
