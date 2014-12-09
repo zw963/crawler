@@ -97,8 +97,6 @@ end
 require_relative '../lib/common'
 include Common
 
-keywords_filename = "#{home_directory}/keywords.txt"
-
 unless test 's', keywords_filename
   logger_with_puts '分类关键字文件 keywords.txt 不存在或者为空, 请首先编辑该文件.'
   exit

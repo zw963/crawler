@@ -16,6 +16,10 @@ module Common
     CGI.escape(keyword)
   end
 
+  def keywords_filename
+    "#{home_directory}/config/keywords.txt"
+  end
+
   def keyword_output
     "\033[0;33m#{keyword}\033[0m"
   end
@@ -50,7 +54,7 @@ module Common
   end
 
   def site_yml_content
-    File.read("#{home_directory}/site.yml")
+    File.read("#{home_directory}/config/site.yml")
   end
 
   def site_info
