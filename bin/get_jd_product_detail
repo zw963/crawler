@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 def capture
-  Dir["#{__dir__}/#{site}/*.csv"].each do |file|
+  Dir["#{home_directory}/#{site}/*.csv"].each do |file|
     self.keyword = File.basename(file, '.csv')
 
     logger.info "正在打开 #{keyword} #{category}页面."
@@ -12,7 +12,7 @@ def capture
       name = csv_array[1]
       detail_url = csv_array[2]
 
-      json_filename = "#{__dir__}/#{site}/#{keyword}/#{sku}/details.json"
+      json_filename = "#{home_directory}/#{site}/#{keyword}/#{sku}/details.json"
 
       if test 's', json_filename
         logger_with_puts "跳过 #{name} #{category}页面抓取 !"
@@ -42,6 +42,6 @@ unless ARGV.empty?
   exit 1
 end
 
-require_relative 'lib/common'
+require_relative '../lib/common'
 include Common
 capture

@@ -24,9 +24,13 @@ module Common
   end
 
   def log_name
-    log_name = "#{__dir__}/../log/#{keyword}/#{tags.join('_')}.log"
+    log_name = "#{home_directory}/log/#{keyword}/#{tags.join('_')}.log"
     FileUtils.mkdir_p(File.dirname(log_name))
     log_name
+  end
+
+  def home_directory
+    "#{__dir__}/.."
   end
 
   def browser

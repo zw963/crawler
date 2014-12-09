@@ -36,14 +36,14 @@ end
 def keyword_csv_filename
   fail '不存在抓取关键字!' if keyword.nil?
 
-  keyword_csv_filename = "#{__dir__}/#{site}/#{keyword}.csv"
+  keyword_csv_filename = "#{home_directory}/#{site}/#{keyword}.csv"
 
   if test 's', keyword_csv_filename
     logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"
     throw :exit_capture
   end
 
-  FileUtils.mkdir_p("#{__dir__}/#{site}")
+  FileUtils.mkdir_p("#{home_directory}/#{site}")
   logger.info "打开 #{keyword_csv_filename}"
 
   keyword_csv_filename
@@ -74,7 +74,7 @@ def capture
     anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
     anchors.each do |anchor|
       sku = anchor.attr('sku')
-      FileUtils.mkdir_p("#{__dir__}/#{site}/#{keyword}/#{sku}")
+      FileUtils.mkdir_p("#{home_directory}/#{site}/#{keyword}/#{sku}")
 
       name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
       detail_page_url = "http://item.jd.com/#{sku}.html"
@@ -95,10 +95,10 @@ ensure
   end
 end
 
-keywords_filename = "#{__dir__}/keywords.txt"
-
-require_relative 'lib/common'
+require_relative '../lib/common'
 include Common
+
+keywords_filename = "#{home_directory}/keywords.txt"
 
 unless test 's', keywords_filename
   logger_with_puts '分类关键字文件 keywords.txt 不存在或者为空, 请首先编辑该文件.'
