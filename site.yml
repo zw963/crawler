@@ -1,0 +1,6 @@
+京东:
+  - "http://search.jd.com/Search?keyword=<%= escaped_keyword %>&enc=utf-8"
+  - 'div.total span strong'
+天猫:
+  - "http://list.tmall.com/search_product.htm?q=<%= escaped_keyword %>"
+  - 'div#J_Crumbs.span'

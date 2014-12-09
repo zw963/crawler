@@ -16,7 +16,7 @@ def product_amount
   else
     iv = Nokogiri::HTML.
       parse(open(search_page_url).read)
-      .css('div.total span strong')
+      .css(amount_css_path)
       .text.to_i
     logger_with_puts "关键字: #{keyword}, 页面报告数量: #{iv}"
 

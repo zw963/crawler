@@ -7,6 +7,7 @@ require 'uri'
 require 'json'
 require_relative 'browser'
 require_relative 'keyword_logger'
+require 'erb'
 
 module Common
   attr_accessor :keyword
@@ -48,15 +49,38 @@ module Common
     }
   end
 
-  def search_page_url
-    case site
-    when '京东'
-      "http://search.jd.com/Search?keyword=#{escaped_keyword}&enc=utf-8"
-    when '天猫'
-      "http://list.tmall.com/search_product.htm?q=#{escaped_keyword}"
+  def site_yml_content
+    File.read("#{home_directory}/site.yml")
+  end
+
+  def site_info
+    return @site_info if @site_info
+
+    site_info = YAML.load(ERB.new(site_yml_content).result(binding))[site]
+
+    if site_info
+      @site_info = site_info
     else
-      logger_with_puts '不存在对应的搜索页面 url, 退出...'
+      logger_with_puts '未指定站点 yml 信息, 退出...'
       exit
+    end
+  end
+
+  def search_page_url
+    if site_info[0].empty?
+      logger_with_puts '未指定搜索页面 url, 退出...'
+      exit
+    else
+      site_info[0]
+    end
+  end
+
+  def amount_css_path
+    if site_info[1].empty?
+      logger_with_puts '未指定页面数量 css path, 退出...'
+      exit
+    else
+      site_info[1]
     end
   end
 
