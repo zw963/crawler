@@ -1,36 +1,34 @@
 #!/usr/bin/env ruby
 
-def page_count(product_amount)
-  per_page_count=(ENV['product_count_per_page'] or 60)
-  logger.info '单页结果的数量使用默认值 60'
-  page_count = product_amount % per_page_count == 0 ? product_amount.to_i/per_page_count : product_amount.to_i/per_page_count + 1
-  logger_with_puts "按照每页 #{ENV['product_count_per_page'] or 60} 计算, 总共需要 #{page_count} 页."
-  page_count
+def search_page_content
+  content = instance_variable_get(:"@#{keyword}_search_page_content")
+  return content unless content.nil?
+
+  begin
+    browser.goto(search_page_url)
+    content = Nokogiri::HTML(browser.html)
+    if content.blank?
+      raise SocketError
+    else
+      instance_variable_set(:"@#{keyword}_search_page_content", content)
+    end
+  rescue SocketError, Net::ReadTimeout
+    logger_with_puts $!.message, :error
+    retry
+  end
 end
 
 def product_amount
-  iv = instance_variable_get(:"@#{keyword}_amount")
+  element = search_page_content.css(product_amount_css_path)[0]
+  raise '请通过浏览器检查产品总数的 css 设定.' if element.nil?
+  product_amount = element.text[/\d+/].to_i
 
-  if iv
-    iv
+  if product_amount == 0
+    logger_with_puts "#{keyword} 总数为 0, 取消抓取."
+    throw :exit_capture
   else
-    iv = Nokogiri::HTML.
-      parse(open(search_page_url).read)
-      .css(amount_css_path)
-      .text.to_i
-    logger_with_puts "关键字: #{keyword}, 页面报告数量: #{iv}"
-
-    if iv == 0
-      logger_with_puts "#{keyword} 数量为 0, 取消抓取."
-      throw :exit_capture
-    end
-
-    instance_variable_set(:"@#{keyword}_amount", iv)
-    iv
+    logger_with_puts "关键字: #{keyword}, 总数: #{product_amount}"
   end
-rescue SocketError, Net::ReadTimeout
-  logger_with_puts $!.message, :error
-  retry
 end
 
 def keyword_csv_filename
@@ -53,11 +51,11 @@ def capture
   csv_file = CSV.open(keyword_csv_filename, "wb")
   contents = []
 
-  (1..2*page_count(product_amount)-1).step(2).each do |page|
+  page_array.each do |page|
     logger.info "正在打开第 #{page} 页."
     begin
       browser.reset!
-      browser.goto search_page_url
+      browser.goto search_page_url.concat(page_url).concat(page.to_s)
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
       logger_with_puts "正在收集第 #{page} 页结果."
@@ -85,7 +83,7 @@ def capture
     end
     logger_with_puts "#{label(keyword)} 抓取完成."
   end
-  logger_with_puts "#{keyword} 数量为 #{product_amount}, 抓取数量为: #{counter}."
+  logger_with_puts "关键字: #{keyword_output}, 抓取数量为: #{counter}."
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."
@@ -102,7 +100,6 @@ unless test 's', keywords_filename
   exit
 end
 
-puts '单页结果的数量使用默认值 60, 如果不符, 设定环境变量 $product_count_per_page 改变默认值.'
 begin
   File.foreach(keywords_filename).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
     self.keyword = keyword

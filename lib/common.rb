@@ -12,8 +12,12 @@ require 'erb'
 module Common
   attr_accessor :keyword
 
-  def escaped_keyword
+  def escaped_utf8_keyword
     CGI.escape(keyword)
+  end
+
+  def escaped_gbk_keyword
+    CGI.escape(keyword.encode('gb2312', 'utf-8'))
   end
 
   def keywords_filename
@@ -25,7 +29,7 @@ module Common
   end
 
   def label(keyword=name)
-    "\033[0;31m#{keyword}\033[0m #{category}#{task}"
+    "\033[0;33m#{keyword}\033[0m #{category}#{task}"
   end
 
   def log_name
@@ -44,12 +48,11 @@ module Common
 
   def hash_map
     {
-      'jd' => '京东',
-      'tm' => '天猫',
       'product' => '产品',
       'picture' => '图片',
       'detail' => '信息',
-      'list' => '列表'
+      'list' => '列表',
+      'downloader' => '下载器'
     }
   end
 
@@ -58,8 +61,6 @@ module Common
   end
 
   def site_info
-    return @site_info if @site_info
-
     site_info = YAML.load(ERB.new(site_yml_content).result(binding))[site]
 
     if site_info
@@ -79,12 +80,47 @@ module Common
     end
   end
 
-  def amount_css_path
+  def product_amount_css_path
     if site_info[1].empty?
-      logger_with_puts '未指定页面数量 css path, 退出...'
+      logger_with_puts '未指定产品总数 css path, 退出...'
       exit
     else
       site_info[1]
+    end
+  end
+
+  def pages_count_css_path
+    if site_info[2].empty?
+      logger_with_puts '未指定页面数量 css path, 退出...'
+      exit
+    else
+      site_info[2]
+    end
+  end
+
+  def pages_count
+    element = search_page_content.css(pages_count_css_path)[0]
+    # 如果找不到分页 CSS, 便假设只有一页.
+    return 1 if element.nil?
+
+    element.text[/\d+/].to_i
+  end
+
+  def page_array
+    if site_info[4].empty?
+      logger_with_puts '未指定分页数组, 退出...'
+      exit
+    else
+      eval site_info[4]
+    end
+  end
+
+  def page_url
+    if site_info[3].empty?
+      logger_with_puts '未指定表示跳转页面的 url, 退出...'
+      exit
+    else
+      site_info[3]
     end
   end
 
@@ -99,7 +135,7 @@ module Common
   end
 
   def site
-    tags[0]
+    ENV['CURRENT_SITE']
   end
 
   def category

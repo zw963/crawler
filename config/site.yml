@@ -1,6 +1,12 @@
 京东:
-  - "http://search.jd.com/Search?keyword=<%= escaped_keyword %>&enc=utf-8"
+  - 'http://search.jd.com/Search?keyword=<%= escaped_utf8_keyword %>&enc=utf-8'
   - 'div.total span strong'
+  - 'div#pagin-btm span.page-skip em'
+  - '&page='
+  - '(1..2*pages_count-1).step(2)'
 天猫:
-  - "http://list.tmall.com/search_product.htm?q=<%= escaped_keyword %>"
-  - 'div#J_Crumbs.span'
+  - 'http://list.tmall.com/search_product.htm?q=<%= escaped_gbk_keyword %>'
+  - 'div#J_crumbs span'
+  - 'div#content div.main b.ui-page-skip form'
+  - '&jumpto='
+  - '1..pages_count'
