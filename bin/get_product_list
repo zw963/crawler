@@ -65,25 +65,25 @@ def capture
     end
   end
 
-  logger_with_puts "收集完成, 开始对页面结果进行分析."
-  counter = 0
-  contents.each do |content|
-    anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
-    anchors.each do |anchor|
-      sku = anchor.attr('sku')
-      FileUtils.mkdir_p("#{home_directory}/#{site}/#{keyword}/#{sku}")
+  # logger_with_puts "收集完成, 开始对页面结果进行分析."
+  # counter = 0
+  # contents.each do |content|
+  #   anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
+  #   anchors.each do |anchor|
+  #     sku = anchor.attr('sku')
+  #     FileUtils.mkdir_p("#{home_directory}/#{site}/#{keyword}/#{sku}")
 
-      name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
-      detail_page_url = "http://item.jd.com/#{sku}.html"
-      picture_page_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
+  #     name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
+  #     detail_page_url = "http://item.jd.com/#{sku}.html"
+  #     picture_page_url = "http://www.jd.com/bigimage.aspx?id=#{sku}"
 
-      csv_file << [sku, name, detail_page_url, picture_page_url]
-      counter += 1
-      logger.info "插入第 #{counter} 条记录."
-    end
-    logger_with_puts "#{label(keyword)} 抓取完成."
-  end
-  logger_with_puts "关键字: #{keyword_output}, 抓取数量为: #{counter}."
+  #     csv_file << [sku, name, detail_page_url, picture_page_url]
+  #     counter += 1
+  #     logger.info "插入第 #{counter} 条记录."
+  #   end
+  #   logger_with_puts "#{label(keyword)} 抓取完成."
+  # end
+  # logger_with_puts "关键字: #{keyword_output}, 抓取数量为: #{counter}."
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."

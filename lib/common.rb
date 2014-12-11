@@ -135,7 +135,7 @@ module Common
   end
 
   def site
-    ENV['CURRENT_SITE']
+    ENV['SITE']
   end
 
   def category
