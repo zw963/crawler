@@ -2,17 +2,17 @@
 
 def capture
   Dir["#{home_directory}/#{site}/*.csv"].each do |file|
-    self.keyword = File.basename(file, '.csv')
+    $keyword = File.basename(file, '.csv')
     picture_count = 0
 
-    logger.info "正在打开 #{keyword} 图片页面."
+    logger.info "正在打开 #{$keyword} 图片页面."
 
     list = CSV.read(file).each do |csv_array|
       sku = csv_array[0]
       name = csv_array[1]
       picture_url = csv_array[3]
 
-      picture_csv_filename = "#{home_directory}/#{site}/#{keyword}/#{sku}/pictures.csv"
+      picture_csv_filename = "#{home_directory}/#{site}/#{$keyword}/#{sku}/pictures.csv"
 
       if test 's', picture_csv_filename
         logger_with_puts "跳过 #{name} 图片抓取 !"
@@ -46,8 +46,7 @@ def capture
     logger_with_puts "抓取图片数量: #{picture_count}"
   end
 ensure
-  logger_with_puts '正在关闭浏览器'
-  browser.close unless @browser.nil?
+  browser.close
 end
 
 unless ARGV.empty?

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 def search_page_content
-  content = instance_variable_get(:"@#{keyword}_search_page_content")
+  content = instance_variable_get(:"@#{$keyword}_search_page_content")
   return content unless content.nil?
 
   begin
@@ -10,7 +10,7 @@ def search_page_content
     if content.blank?
       raise SocketError
     else
-      instance_variable_set(:"@#{keyword}_search_page_content", content)
+      instance_variable_set(:"@#{$keyword}_search_page_content", content)
     end
   rescue SocketError, Net::ReadTimeout
     logger_with_puts $!.message, :error
@@ -24,17 +24,17 @@ def product_amount
   product_amount = element.text[/\d+/].to_i
 
   if product_amount == 0
-    logger_with_puts "#{keyword} 总数为 0, 取消抓取."
+    logger_with_puts "#{$keyword} 总数为 0, 取消抓取."
     throw :exit_capture
   else
-    logger_with_puts "关键字: #{keyword}, 总数: #{product_amount}"
+    logger_with_puts "关键字: #{$keyword}, 总数: #{product_amount}"
   end
 end
 
 def keyword_csv_filename
-  fail '不存在抓取关键字!' if keyword.nil?
+  fail '不存在抓取关键字!' if $keyword.nil?
 
-  keyword_csv_filename = "#{home_directory}/#{site}/#{keyword}.csv"
+  keyword_csv_filename = "#{home_directory}/#{site}/#{$keyword}.csv"
 
   if test 's', keyword_csv_filename
     logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"
@@ -71,7 +71,7 @@ def capture
   #   anchors = Nokogiri::HTML.parse(content).css('ul.list-h.clearfix li').reject {|e| e.attr('sku').nil? }
   #   anchors.each do |anchor|
   #     sku = anchor.attr('sku')
-  #     FileUtils.mkdir_p("#{home_directory}/#{site}/#{keyword}/#{sku}")
+  #     FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{sku}")
 
   #     name = anchor.css('div.p-name a').search('./font[1]|./text()').text.strip
   #     detail_page_url = "http://item.jd.com/#{sku}.html"
@@ -81,7 +81,7 @@ def capture
   #     counter += 1
   #     logger.info "插入第 #{counter} 条记录."
   #   end
-  #   logger_with_puts "#{label(keyword)} 抓取完成."
+  #   logger_with_puts "#{label($keyword)} 抓取完成."
   # end
   # logger_with_puts "关键字: #{keyword_output}, 抓取数量为: #{counter}."
 ensure
@@ -102,11 +102,10 @@ end
 
 begin
   File.foreach(keywords_filename).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
-    self.keyword = keyword
+    $keyword = keyword
 
     catch(:exit_capture) { capture }
   end
 ensure
-  logger_with_puts '正在关闭浏览器'
-  browser.close unless @browser.nil?
+  browser.close
 end

@@ -5,19 +5,18 @@ require 'nokogiri'
 require 'watir-webdriver'
 require 'uri'
 require 'json'
-require_relative 'browser'
-require_relative 'keyword_logger'
 require 'erb'
 
-module Common
-  attr_accessor :keyword
+require_relative 'browser'
+require_relative 'keyword_logger'
 
+module Common
   def escaped_utf8_keyword
-    CGI.escape(keyword)
+    CGI.escape($keyword)
   end
 
   def escaped_gbk_keyword
-    CGI.escape(keyword.encode('gb2312', 'utf-8'))
+    CGI.escape($keyword.encode('gb2312', 'utf-8'))
   end
 
   def keywords_filename
@@ -25,15 +24,15 @@ module Common
   end
 
   def keyword_output
-    "\033[0;33m#{keyword}\033[0m"
+    "\033[0;33m#{$keyword}\033[0m"
   end
 
-  def label(keyword=name)
+  def label(keyword)
     "\033[0;33m#{keyword}\033[0m #{category}#{task}"
   end
 
   def log_name
-    log_name = "#{home_directory}/log/#{keyword}/#{tags.join('_')}.log"
+    log_name = "#{home_directory}/log/#{$keyword}/#{tags.join('_')}.log"
     FileUtils.mkdir_p(File.dirname(log_name))
     log_name
   end
@@ -43,7 +42,7 @@ module Common
   end
 
   def browser
-    @browser ||= Browser.browser(keyword)
+    @browser ||= Browser.instance
   end
 
   def hash_map
@@ -125,12 +124,12 @@ module Common
   end
 
   def logger
-    logger = eval("$#{keyword}_logger")
+    logger = eval("$#{$keyword}_logger")
 
     if logger
       logger
     else
-      eval("$#{keyword}_logger = KeywordLogger.logger(keyword)")
+      eval "$#{$keyword}_logger = KeywordLogger.logger"
     end
   end
 

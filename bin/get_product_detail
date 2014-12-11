@@ -3,16 +3,16 @@
 
 def capture
   Dir["#{home_directory}/#{site}/*.csv"].each do |file|
-    self.keyword = File.basename(file, '.csv')
+    $keyword = File.basename(file, '.csv')
 
-    logger.info "正在打开 #{keyword} #{category}页面."
+    logger.info "正在打开 #{$keyword} #{category}页面."
 
     list = CSV.read(file).each do |csv_array|
       sku = csv_array[0]
       name = csv_array[1]
       detail_url = csv_array[2]
 
-      json_filename = "#{home_directory}/#{site}/#{keyword}/#{sku}/details.json"
+      json_filename = "#{home_directory}/#{site}/#{$keyword}/#{sku}/details.json"
 
       if test 's', json_filename
         logger_with_puts "跳过 #{name} #{category}页面抓取 !"

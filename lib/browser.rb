@@ -1,24 +1,28 @@
+require 'singleton'
+
 class Browser
-  def self.browser(keyword, non_headless=ENV['NON_HEADLESS'])
-    fail '启动 browser 需要首先指定 keyword!' if keyword.nil?
-    @keyword = keyword
+  include Singleton
 
-    return if non_headless
+  def initialize
+    unless eval(ENV['HEADLESS'].to_s) == false
+      require 'headless'
+      @headless = Headless.new
+      @headless.start
+    end
 
-    require 'headless'
-    @headless = Headless.new
-    @headless.start
-  ensure
     if ENV['CHROME_PATH']
       Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-      browser = Watir::Browser.new(:chrome)
+      @browser = Watir::Browser.new(:chrome)
     else
       puts '没有设定 $CHROME_PATH 环境变量, 使用默认驱动 Firefox. (Chrome 会快很多!)'
-      browser = Watir::Browser.new
+      @browser = Watir::Browser.new
     end
-    logger_with_puts "启动浏览器成功."
 
-    return browser
+    logger_with_puts "启动浏览器成功."
+  end
+
+  def method_missing(meth, *args)
+    @browser.send(meth, *args)
   end
 
   def close

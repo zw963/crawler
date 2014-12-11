@@ -1,9 +1,8 @@
 require 'logger'
 
 class KeywordLogger
-  def self.logger(keyword)
-    fail '启动 logger 需要首先指定 keyword!' if keyword.nil?
-    @keyword = keyword
+  def self.logger
+    fail '需要首先指定 keyword!' if $keyword.nil?
 
     logger = Logger.new(log_name)
     logger.progname = "#{tags.join}"
