@@ -5,6 +5,8 @@
   - '&page='
   - '(1..2*pages_count-1).step(2)'
   - '//li[@sku]'
+  - 'div#product-detail-1 ul.detail-list li'
+  - 'div#spec-n1'
 天猫:
   - 'http://list.tmall.com/search_product.htm?q=<%= escaped_gbk_keyword %>'
   - 'div#J_crumbs span'
@@ -12,3 +14,5 @@
   - '&jumpto='
   - '1..pages_count'
   - '//div[@data-id]'
+  - 'ul#J_AttrUL li'
+  - 'div.tb-booth a'

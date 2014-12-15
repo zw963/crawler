@@ -79,7 +79,7 @@ module Common
     end
   end
 
-  def product_amount_css_path
+  def product_amount_css
     if site_info[1].empty?
       logger_with_puts '未指定产品总数 css path, 退出...'
       exit
@@ -88,7 +88,7 @@ module Common
     end
   end
 
-  def pages_count_css_path
+  def pages_count_css
     if site_info[2].empty?
       logger_with_puts '未指定页面数量 css path, 退出...'
       exit
@@ -106,12 +106,30 @@ module Common
     end
   end
 
+  def product_detail_css
+    if site_info[6].empty?
+      logger_with_puts '未指定产品详细信息 css path, 退出...'
+      exit
+    else
+      site_info[6]
+    end
+  end
+
+  def product_image_detail_css
+    if site_info[7].empty?
+      logger_with_puts '未指定图片链接 css path, 退出...'
+      exit
+    else
+      site_info[7]
+    end
+  end
+
   def product_id_attribute
     product_container_xpath[/@([\w\-_]+)/,1]
   end
 
   def pages_count
-    element = search_page_content.css(pages_count_css_path)[0]
+    element = search_page_content.css(pages_count_css)[0]
     # 如果找不到分页 CSS, 便假设只有一页.
     return 1 if element.nil?
 

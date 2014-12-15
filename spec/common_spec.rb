@@ -33,7 +33,7 @@ HERE
       end
 
       it 'should return amount css path' do
-        expect(amount_css_path).to eq "div.total span strong"
+        expect(amount_css).to eq "div.total span strong"
       end
     end
 

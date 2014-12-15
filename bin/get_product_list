@@ -19,7 +19,7 @@ def search_page_content
 end
 
 def product_amount
-  element = search_page_content.css(product_amount_css_path)[0]
+  element = search_page_content.css(product_amount_css)[0]
   raise '请通过浏览器检查产品总数的 css 设定.' if element.nil?
   product_amount = element.text[/\d+/].to_i
 
@@ -86,7 +86,7 @@ def capture
         product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first
         `echo #{id} > "#{product_dir}"/id`
 
-        # picture_page_url = "http://www.jd.com/bigimage.aspx?id=#{id}"
+        # image_page_url = "http://www.jd.com/bigimage.aspx?id=#{id}"
 
         csv_file << [id, name, detail_page_url]
         counter += 1
@@ -120,5 +120,5 @@ begin
     catch(:exit_capture) { capture }
   end
 ensure
-  browser.close
+  browser.close unless @browser.nil?
 end
