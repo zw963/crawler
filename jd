@@ -1,9 +1,5 @@
 #!/bin/sh
 
-SCRIPT_DIRECTORY=$(dirname `which $0`)/bin
 export SITE='京东'
 
-$SCRIPT_DIRECTORY/get_product_list
-$SCRIPT_DIRECTORY/get_product_detail
-# $SCRIPT_DIRECTORY/get_image_list
-# $SCRIPT_DIRECTORY/get_image_downloader
+$(dirname `which $0`)/bin/crawler
