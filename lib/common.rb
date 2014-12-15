@@ -32,7 +32,7 @@ module Common
   end
 
   def log_name
-    log_name = "#{home_directory}/log/#{$keyword}/#{tags.join('_')}.log"
+    log_name = "#{home_directory}/log/#{$keyword}/#{site}_#{tags.join('_')}.log"
     FileUtils.mkdir_p(File.dirname(log_name))
     log_name
   end
@@ -95,6 +95,19 @@ module Common
     else
       site_info[2]
     end
+  end
+
+  def product_container_xpath
+    if site_info[5].empty?
+      logger_with_puts '未指定产品列表容器 css path, 退出...'
+      exit
+    else
+      site_info[5]
+    end
+  end
+
+  def product_id_attribute
+    product_container_xpath[/@([\w\-_]+)/,1]
   end
 
   def pages_count

@@ -26,7 +26,7 @@ class Browser
   end
 
   def close
-    logger_with_puts '正在关闭浏览器'
+    logger_with_puts '正在关闭浏览器.'
     @browser.close unless @browser.nil?
     @headless.destroy unless @headless.nil?
   end

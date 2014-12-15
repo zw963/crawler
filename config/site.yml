@@ -4,9 +4,11 @@
   - 'div#pagin-btm span.page-skip em'
   - '&page='
   - '(1..2*pages_count-1).step(2)'
+  - '//li[@sku]'
 天猫:
   - 'http://list.tmall.com/search_product.htm?q=<%= escaped_gbk_keyword %>'
   - 'div#J_crumbs span'
   - 'div#content div.main b.ui-page-skip form'
   - '&jumpto='
   - '1..pages_count'
+  - '//div[@data-id]'
