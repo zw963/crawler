@@ -21,6 +21,7 @@ def capture(file)
     when '京东'
       content = Nokogiri::HTML(open(detail_url))
     when '天猫'
+      browser.reset!
       browser.goto detail_url
       content = Nokogiri::HTML(browser.html)
     end
@@ -71,7 +72,11 @@ end
 require_relative '../lib/common'
 include Common
 
-Dir["#{home_directory}/#{site}/*.csv"].each do |file|
-  $keyword = File.basename(file, '.csv')
-  capture(file)
+begin
+  Dir["#{home_directory}/#{site}/*.csv"].each do |file|
+    $keyword = File.basename(file, '.csv')
+    capture(file)
+  end
+ensure
+  browser.close unless @browser.nil?
 end
