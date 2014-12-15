@@ -48,7 +48,7 @@ module Common
   def hash_map
     {
       'product' => '产品',
-      'picture' => '图片',
+      'image' => '图片',
       'detail' => '信息',
       'list' => '列表',
       'downloader' => '下载器'
