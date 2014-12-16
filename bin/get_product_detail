@@ -19,7 +19,7 @@ def capture(file)
 
     case site
     when '京东'
-      content = Nokogiri::HTML(open(detail_url))
+      content = Nokogiri::HTML(open(detail_url).read)
     when '天猫'
       browser.reset!
       browser.goto detail_url

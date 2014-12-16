@@ -111,6 +111,53 @@ module Common
     puts message
   end
 
+  def search_page_content
+    content = instance_variable_get(:"@#{$keyword}_search_page_content")
+    return content unless content.nil?
+
+    begin
+      browser.goto(search_page_url_with_pagination + '1')
+      content = Nokogiri::HTML(browser.html)
+      if content.blank?
+        raise SocketError
+      else
+        instance_variable_set(:"@#{$keyword}_search_page_content", content)
+      end
+    rescue SocketError, Net::ReadTimeout
+      logger_with_puts $!.message, :error
+      retry
+    end
+  end
+
+  def product_amount
+    element = search_page_content.css(search_page_product_amount_css)[0]
+    raise '请通过浏览器检查产品总数的 css 设定.' if element.nil?
+    product_amount = element.text[/\d+/].to_i
+
+    if product_amount == 0
+      logger_with_puts "#{$keyword} 总数为 0, 取消抓取."
+      throw :exit_capture
+    else
+      logger_with_puts "关键字: #{$keyword}, 总数: #{product_amount}"
+    end
+  end
+
+  def keyword_csv_filename
+    fail '不存在抓取关键字!' if $keyword.nil?
+
+    keyword_csv_filename = "#{home_directory}/#{site}/#{$keyword}.csv"
+
+    if test 's', keyword_csv_filename
+      logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"
+      throw :exit_capture
+    end
+
+    FileUtils.mkdir_p("#{home_directory}/#{site}")
+    logger.info "打开 #{keyword_csv_filename}"
+
+    keyword_csv_filename
+  end
+
   private
   def tags
     @tags ||= $0.split('_').compact.map {|e| hash_map[e] }.compact
