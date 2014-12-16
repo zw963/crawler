@@ -73,11 +73,11 @@ module Common
   end
 
   def product_id_attribute
-    product_container_xpath[/@([\w\-_]+)/,1]
+    product_id_xpath[/@([\w\-_]+)/,1]
   end
 
   def pages_count
-    element = search_page_content.css(pages_count_css)[0]
+    element = search_page_content.css(search_page_pages_count_css)[0]
     # 如果找不到分页 CSS, 便假设只有一页.
     return 1 if element.nil?
 

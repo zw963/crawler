@@ -30,7 +30,7 @@ def capture(file)
       logger.info "创建 #{product_detail_filename}"
       product_detail_file = File.open(product_detail_filename, "wb")
 
-      details = content.css(product_detail_css)
+      details = content.css(product_page_detail_list_css)
       details_hash = Hash[details.map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }].to_json rescue "{}"
 
       # specs 只有京东才有.
@@ -47,7 +47,7 @@ def capture(file)
       logger.info "创建 #{image_pages_url_filename}"
       images_page_url_file = File.open(image_pages_url_filename, "wb")
 
-      image_detail_element = content.css(image_page_css)
+      image_detail_element = content.css(product_page_image_link_css)
 
       image_pages_url =
         if image_detail_element.search('./@href').empty?

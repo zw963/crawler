@@ -5,7 +5,7 @@ def search_page_content
   return content unless content.nil?
 
   begin
-    browser.goto(search_page_url)
+    browser.goto(search_page_url_with_pagination.concat('1'))
     content = Nokogiri::HTML(browser.html)
     if content.blank?
       raise SocketError
@@ -19,7 +19,7 @@ def search_page_content
 end
 
 def product_amount
-  element = search_page_content.css(product_amount_css)[0]
+  element = search_page_content.css(search_page_product_amount_css)[0]
   raise '请通过浏览器检查产品总数的 css 设定.' if element.nil?
   product_amount = element.text[/\d+/].to_i
 
@@ -51,11 +51,11 @@ def capture
   csv_file = CSV.open(keyword_csv_filename, "wb")
   contents = []
 
-  eval(page_array).each do |page|
+  eval(page_number_sequence).each do |page|
     logger.info "正在打开第 #{page} 页."
     begin
       browser.reset!
-      browser.goto search_page_url.concat(page_url).concat(page.to_s)
+      browser.goto search_page_url_with_pagination.concat(page.to_s)
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
       logger_with_puts "正在收集第 #{page} 页结果."
@@ -68,7 +68,7 @@ def capture
   logger_with_puts "收集完成, 开始对页面结果进行分析."
   counter = 0
   contents.each do |content|
-    anchors = Nokogiri.HTML(content).search(product_container_xpath)
+    anchors = Nokogiri.HTML(content).search(product_id_xpath)
 
     id_array = []
 
@@ -85,8 +85,6 @@ def capture
 
         product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first
         `echo #{id} > "#{product_dir}"/id`
-
-        # image_page_url = "http://www.jd.com/bigimage.aspx?id=#{id}"
 
         csv_file << [id, name, detail_page_url]
         counter += 1
