@@ -3,11 +3,11 @@
 require_relative '../lib/common'
 include Common
 
-Dir["#{home_directory}/#{site}/**/images.csv"].each_slice(20) do |filenames|
+Dir["#{home_directory}/#{site}/**/images_url.csv"].each_slice(20) do |filenames|
   filenames.each do |filename|
     dirname = File.dirname(filename)
     pic_urls = File.readlines(filename).map(&:chomp).join(' ')
-    spawn("wget -t5 -nc -P #{dirname} #{pic_urls}")
+    spawn("wget -t5 -nc -P \"#{dirname}\" #{pic_urls}")
   end
   sleep 10
 end
