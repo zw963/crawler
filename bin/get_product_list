@@ -51,7 +51,7 @@ def capture
   csv_file = CSV.open(keyword_csv_filename, "wb")
   contents = []
 
-  page_array.each do |page|
+  eval(page_array).each do |page|
     logger.info "正在打开第 #{page} 页."
     begin
       browser.reset!
@@ -116,6 +116,7 @@ end
 begin
   File.foreach(keywords_filename).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
     $keyword = keyword
+    load_site_info
 
     catch(:exit_capture) { capture }
   end

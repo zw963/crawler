@@ -75,6 +75,8 @@ include Common
 begin
   Dir["#{home_directory}/#{site}/*.csv"].each do |file|
     $keyword = File.basename(file, '.csv')
+    load_site_info
+
     capture(file)
   end
 ensure

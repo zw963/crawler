@@ -11,6 +11,23 @@ require_relative 'browser'
 require_relative 'keyword_logger'
 
 module Common
+  def site_yml_content
+    File.read("#{home_directory}/config/site.yml")
+  end
+
+  def load_site_info
+    site_info = YAML.load(ERB.new(site_yml_content).result(binding))[site]
+
+    if site_info.is_a? Hash
+      site_info.each_pair do |k, v|
+        self.class.class_eval { define_method(k) { v } }
+      end
+    else
+      logger_with_puts '未指定该站点 yml 信息, 请首先编辑 site.yml 细节.'
+      exit
+    end
+  end
+
   def escaped_utf8_keyword
     CGI.escape($keyword)
   end
@@ -55,75 +72,6 @@ module Common
     }
   end
 
-  def site_yml_content
-    File.read("#{home_directory}/config/site.yml")
-  end
-
-  def site_info
-    site_info = YAML.load(ERB.new(site_yml_content).result(binding))[site]
-
-    if site_info
-      @site_info = site_info
-    else
-      logger_with_puts '未指定站点 yml 信息, 退出...'
-      exit
-    end
-  end
-
-  def search_page_url
-    if site_info[0].empty?
-      logger_with_puts '未指定搜索页面 url, 退出...'
-      exit
-    else
-      site_info[0]
-    end
-  end
-
-  def product_amount_css
-    if site_info[1].empty?
-      logger_with_puts '未指定产品总数 css path, 退出...'
-      exit
-    else
-      site_info[1]
-    end
-  end
-
-  def pages_count_css
-    if site_info[2].empty?
-      logger_with_puts '未指定页面数量 css path, 退出...'
-      exit
-    else
-      site_info[2]
-    end
-  end
-
-  def product_container_xpath
-    if site_info[5].empty?
-      logger_with_puts '未指定产品列表容器 css path, 退出...'
-      exit
-    else
-      site_info[5]
-    end
-  end
-
-  def product_detail_css
-    if site_info[6].empty?
-      logger_with_puts '未指定产品详细信息 css path, 退出...'
-      exit
-    else
-      site_info[6]
-    end
-  end
-
-  def image_page_css
-    if site_info[7].empty?
-      logger_with_puts '未指定图片链接 css path, 退出...'
-      exit
-    else
-      site_info[7]
-    end
-  end
-
   def product_id_attribute
     product_container_xpath[/@([\w\-_]+)/,1]
   end
@@ -134,24 +82,6 @@ module Common
     return 1 if element.nil?
 
     element.text[/\d+/].to_i
-  end
-
-  def page_array
-    if site_info[4].empty?
-      logger_with_puts '未指定分页数组, 退出...'
-      exit
-    else
-      eval site_info[4]
-    end
-  end
-
-  def page_url
-    if site_info[3].empty?
-      logger_with_puts '未指定表示跳转页面的 url, 退出...'
-      exit
-    else
-      site_info[3]
-    end
   end
 
   def logger
