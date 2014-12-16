@@ -115,7 +115,7 @@ module Common
     end
   end
 
-  def product_image_detail_css
+  def image_page_css
     if site_info[7].empty?
       logger_with_puts '未指定图片链接 css path, 退出...'
       exit

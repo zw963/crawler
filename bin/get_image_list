@@ -1,52 +1,46 @@
 #!/usr/bin/env ruby
 
-def capture
-  Dir["#{home_directory}/#{site}/*.csv"].each do |file|
-    $keyword = File.basename(file, '.csv')
-    image_count = 0
+def capture(file)
+  image_count = 0
 
-    logger.info "正在打开 #{$keyword} 图片页面."
+  logger.info "正在打开 #{$keyword} 图片页面."
 
-    list = CSV.read(file).each do |csv_array|
-      sku = csv_array[0]
-      name = csv_array[1]
-      image_url = csv_array[3]
+  dir = File.dirname(file)
+  name = File.basename(dir)
+  images_page_url = File.read(file)
 
-      image_csv_filename = "#{home_directory}/#{site}/#{$keyword}/#{sku}/images.csv"
+  images_url_csv_filename = "#{dir}/images_url.csv"
 
-      if test 's', image_csv_filename
-        logger_with_puts "跳过 #{name} 图片抓取 !"
-        next
-      end
-
-      logger.info "创建 #{image_csv_filename}"
-      logger.info "正在打开 #{image_url}"
-      begin
-        image_csv_file = CSV.open(image_csv_filename, "wb")
-        browser.reset!
-        browser.goto image_url
-
-        count = 0
-        browser.ul(class: 'list-h').lis.each.with_index do |li, i|
-          li.click
-          image_csv_file << [browser.div(id: 'biger').img.src]
-          image_count += 1
-          count += 1
-          logger.info "插入第 #{count} 张图片 url."
-        end
-        logger_with_puts "#{label(name)} 抓取完成."
-      rescue Watir::Exception::UnknownObjectException, Net::ReadTimeout
-        logger.info "尝试重新打开 #{image_url}"
-        retry
-      ensure
-        logger.info "正在关闭 #{image_csv_file.path}"
-        image_csv_file.close
-      end
-    end
-    logger_with_puts "抓取图片数量: #{image_count}"
+  if test 's', images_url_csv_filename
+    logger_with_puts "跳过 #{name} 图片 url 抓取 !"
+    return
   end
-ensure
-  browser.close unless @browser.nil?
+
+  logger.info "创建 #{images_url_csv_filename}"
+  logger.info "正在打开 #{images_page_url}"
+
+  begin
+    image_csv_file = CSV.open(images_url_csv_filename, "wb")
+    browser.reset!
+    browser.goto images_page_url
+
+    count = 0
+    browser.ul(class: 'list-h').lis.each.with_index do |li, i|
+      li.click
+      image_csv_file << [browser.div(id: 'biger').img.src]
+      image_count += 1
+      count += 1
+      logger.info "插入第 #{count} 张图片 url."
+    end
+    logger_with_puts "#{label(name)} 抓取完成."
+  rescue Watir::Exception::UnknownObjectException, Net::ReadTimeout
+    logger.info "尝试重新打开 #{images_page_url}"
+    retry
+  ensure
+    logger.info "正在关闭 #{image_csv_file.path}"
+    image_csv_file.close
+  end
+  logger_with_puts "抓取图片数量: #{image_count}"
 end
 
 unless ARGV.empty?
@@ -57,4 +51,11 @@ end
 require_relative '../lib/common'
 include Common
 
-capture
+begin
+  Dir["#{home_directory}/#{site}/**/images_page_url"].each do |file|
+    $keyword = Pathname(file).parent.parent.basename.to_s
+    capture(file)
+  end
+ensure
+  browser.close unless @browser.nil?
+end

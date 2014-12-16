@@ -10,7 +10,7 @@ def capture(file)
     detail_url = csv_array[2]
 
     product_detail_filename = "#{home_directory}/#{site}/#{$keyword}/#{name}/details.json"
-    image_detail_url_filename = "#{home_directory}/#{site}/#{$keyword}/#{name}/image_detail_url.csv"
+    image_pages_url_filename = "#{home_directory}/#{site}/#{$keyword}/#{name}/images_page_url"
 
     if test 's', product_detail_filename
       logger_with_puts "跳过 #{name} #{category}页面抓取 !"
@@ -44,22 +44,22 @@ def capture(file)
     end
 
     begin
-      logger.info "创建 #{image_detail_url_filename}"
-      image_detail_url_file = CSV.open(image_detail_url_filename, "wb")
+      logger.info "创建 #{image_pages_url_filename}"
+      images_page_url_file = File.open(image_pages_url_filename, "wb")
 
-      image_detail_element = content.css(product_image_detail_css)
+      image_detail_element = content.css(image_page_css)
 
-      image_detail_url =
+      image_pages_url =
         if image_detail_element.search('./@href').empty?
           image_detail_element.attr('onclick').text[/'(.*?)'/, 1]
         else
           image_detail_element.attr('href').text
         end
 
-      image_detail_url_file << [id, image_detail_url]
+      images_page_url_file.puts image_pages_url
     ensure
-      logger.info "正在关闭 #{image_detail_url_file.path}"
-      image_detail_url_file.close
+      logger.info "正在关闭 #{images_page_url_file.path}"
+      images_page_url_file.close
     end
   end
 end

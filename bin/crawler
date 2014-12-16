@@ -4,5 +4,5 @@ SCRIPT_DIRECTORY=$(dirname `which $0`)
 
 $SCRIPT_DIRECTORY/get_product_list
 $SCRIPT_DIRECTORY/get_product_detail
-# $SCRIPT_DIRECTORY/get_image_list
+$SCRIPT_DIRECTORY/get_image_list
 # $SCRIPT_DIRECTORY/get_image_downloader
