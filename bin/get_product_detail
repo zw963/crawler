@@ -21,7 +21,6 @@ def capture(file)
     when '京东'
       content = Nokogiri::HTML(open(detail_url).read)
     when '天猫'
-      browser.reset!
       browser.goto detail_url
       content = Nokogiri::HTML(browser.html)
     end

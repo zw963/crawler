@@ -7,7 +7,6 @@ def capture
   eval(page_number_sequence).each do |page|
     logger.info "正在打开第 #{page} 页."
     begin
-      browser.reset!
       browser.goto search_page_url_with_pagination + page.to_s
       10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
@@ -33,7 +32,7 @@ def capture
           when '天猫'
             [anchor.css('p.productTitle').text.strip.tr('/', "\uff0f"), "http://detail.tmall.com/item.htm?id=#{id}"]
           when '京东'
-            [anchor.css('div.p-name a').search('./font[1]|./text()').text.strip, "http://item.jd.com/#{id}.html"]
+            [anchor.css('div.p-name a').search('./font[1]|./text()').text.strip.tr('/', "\uff0f"), "http://item.jd.com/#{id}.html"]
           end
 
         product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first

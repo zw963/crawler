@@ -21,7 +21,6 @@ def capture(file)
 
   begin
     image_csv_file = CSV.open(images_url_csv_filename, "wb")
-    browser.reset!
     browser.goto images_page_url
 
     count = 0
