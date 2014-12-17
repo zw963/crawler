@@ -1,16 +1,20 @@
 京东:
-  search_page_url_with_pagination: 'http://search.jd.com/Search?keyword=<%= escaped_utf8_keyword %>&enc=utf-8&page='
-  search_page_product_amount_css: 'div.total span strong'
-  search_page_pages_count_css: 'div#pagin-btm span.page-skip em'
-  page_number_sequence: '(1..2*pages_count-1).step(2)'
-  product_id_xpath: '//li[@sku]'
-  product_page_detail_list_css: 'div#product-detail-1 ul.detail-list li'
-  product_page_image_link_css: 'div#spec-n1'
+  search_page_url_with_pagination: http://search.jd.com/Search?keyword=<%= escaped_utf8_keyword %>&enc=utf-8&page=
+  search_page_product_amount_css: div.total span strong
+  search_page_pages_count_css: div#pagin-btm span.page-skip em
+  search_page_product_name_expression: anchor.css('div.p-name a').search('./font[1]|./text()')
+  search_page_product_detail_url: http://item.jd.com/
+  page_number_sequence_expression: (1..2*pages_count-1).step(2)
+  product_id_xpath: //li[@sku]
+  product_page_detail_list_css: div#product-detail-1 ul.detail-list li
+  product_page_image_link_css: div#spec-n1
 天猫:
-  search_page_url_with_pagination: 'http://list.tmall.com/search_product.htm?q=<%= escaped_gbk_keyword %>&jumpto='
-  search_page_product_amount_css: 'div#J_crumbs span'
-  search_page_pages_count_css: 'div#content div.main b.ui-page-skip form'
-  page_number_sequence: '1..pages_count'
-  product_id_xpath: '//div[@data-id]'
-  product_page_detail_list_css: 'ul#J_AttrUL li'
-  product_page_image_link_css: 'div.tb-booth a'
+  search_page_url_with_pagination: http://list.tmall.com/search_product.htm?q=<%= escaped_gbk_keyword %>&jumpto=
+  search_page_product_amount_css: div#J_crumbs span
+  search_page_pages_count_css: div#content div.main b.ui-page-skip form
+  search_page_product_name_expression: anchor.css('p.productTitle')
+  search_page_product_detail_url: http://detail.tmall.com/item.htm?id=
+  page_number_sequence_expression: 1..pages_count
+  product_id_xpath: //div[@data-id]
+  product_page_detail_list_css: ul#J_AttrUL li
+  product_page_image_link_css: div.tb-booth a

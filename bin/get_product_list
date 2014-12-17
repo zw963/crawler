@@ -4,11 +4,10 @@ def capture
   csv_file = CSV.open(keyword_csv_filename, "wb")
   contents = []
 
-  eval(page_number_sequence).each do |page|
+  eval(page_number_sequence_expression).each do |page|
     logger.info "正在打开第 #{page} 页."
     begin
       browser.goto search_page_url_with_pagination + page.to_s
-      10.times { browser.send_keys :space; sleep 0.1 }
       contents << browser.html
       logger_with_puts "正在收集第 #{page} 页结果."
     rescue Net::ReadTimeout
@@ -27,13 +26,9 @@ def capture
     anchors.each do |anchor|
       id = anchor.attr(product_id_attribute)
       unless id_array.include? id
-        name, detail_page_url =
-          case site
-          when '天猫'
-            [anchor.css('p.productTitle').text.strip.tr('/', "\uff0f"), "http://detail.tmall.com/item.htm?id=#{id}"]
-          when '京东'
-            [anchor.css('div.p-name a').search('./font[1]|./text()').text.strip.tr('/', "\uff0f"), "http://item.jd.com/#{id}.html"]
-          end
+        name = eval(search_page_product_name_expression).text.strip.tr('/', "\uff0f")
+        detail_page_url = search_page_product_detail_url + id.to_s
+        detail_page_url = detail_page_url.concat('.html') unless detail_page_url =~ /\?/
 
         product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first
         `echo #{id} > "#{product_dir}"/id`
