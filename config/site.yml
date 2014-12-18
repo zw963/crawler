@@ -8,6 +8,9 @@
   product_id_xpath: //li[@sku]
   product_page_detail_list_css: div#product-detail-1 ul.detail-list li
   product_page_image_link_css: div#spec-n1
+  product_page_little_image_lists_expression: 'div(id: "spec-list").div(class: "spec-items").ul(class: "lh").lis'
+  product_page_image_expression: 'div(id: "spec-n1").img'
+  product_page_float_image_id: zoomdiv
 天猫:
   search_page_url_with_pagination: http://list.tmall.com/search_product.htm?q=<%= escaped_gbk_keyword %>&jumpto=
   search_page_product_amount_css: div#J_crumbs span
@@ -18,3 +21,6 @@
   product_id_xpath: //div[@data-id]
   product_page_detail_list_css: ul#J_AttrUL li
   product_page_image_link_css: div.tb-booth a
+  product_page_little_image_lists_expression: 'ul(id: "J_UlThumb").lis'
+  product_page_image_expression: 'img(id: "J_ImgBooth")'
+  product_page_float_image_id: ks-content-ks-component

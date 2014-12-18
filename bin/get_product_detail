@@ -4,62 +4,73 @@
 def capture(file)
   logger.info "正在打开 #{$keyword} #{category}页面."
 
-  list = CSV.read(file).each do |csv_array|
+  list = CSV.foreach(file) do |csv_array|
     id = csv_array[0]
     name = csv_array[1]
     detail_url = csv_array[2]
 
-    product_detail_filename = "#{home_directory}/#{site}/#{$keyword}/#{name}/details.json"
-    image_pages_url_filename = "#{home_directory}/#{site}/#{$keyword}/#{name}/images_page_url"
+    directory = "#{home_directory}/#{site}/#{$keyword}/#{name}"
 
-    if test 's', product_detail_filename
+    product_details_filename = "#{directory}/product_details.html"
+    product_details_file = File.open("#{directory}/product_details.html", 'wb')
+
+    if test 's', product_details_filename
       logger_with_puts "跳过 #{name} #{category}页面抓取 !"
       next
     end
 
-    case site
-    when '天猫'
-      browser.goto detail_url
-      content = Nokogiri::HTML(browser.html)
-    else
-      content = Nokogiri::HTML(open(detail_url).read)
+    contents = []
+    browser.goto detail_url
+
+    counter = 0
+    browser.instance_eval(product_page_little_image_lists_expression).each do |li|
+      li.hover
+      sleep 0.5
+      browser.instance_eval(product_page_image_expression).hover
+      Watir::Wait.until { browser.html.include? product_page_float_image_id }
+      contents << browser.html
+      counter += 1
+      logger_with_puts "成功提取 #{name} 第 #{counter} 张图片."
     end
 
-    begin
-      logger.info "创建 #{product_detail_filename}"
-      product_detail_file = File.open(product_detail_filename, "wb")
+    product_details_file.puts contents
+    logger_with_puts "保存产品细节信息到 #{product_details_filename} 成功."
+    # begin
+    #   logger.info "创建 #{product_detail_filename}"
+    #   product_detail_file = File.open(product_detail_filename, "a+")
 
-      details = content.css(product_page_detail_list_css)
-      details_hash = Hash[details.map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }].to_json rescue "{}"
+    #   details = content.css(product_page_detail_list_css)
+    #   details_hash = Hash[details.map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }] rescue {}
 
-      # specs 只有京东才有.
-      specs = content.css('div#product-detail-2 table.Ptable tr')
-      specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }].to_json rescue "{}"
-      product_detail_file.puts "{\"#{id}\": {\"details\": #{details_hash}, \"specification\": #{specs_hash}}}"
-      logger_with_puts "#{label(name)} 抓取完成."
-    ensure
-      logger.info "正在关闭 #{product_detail_file.path}"
-      product_detail_file.close
-    end
+    #   # specs 只有京东才有.
+    #   specs = content.css('div#product-detail-2 table.Ptable tr')
+    #   specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }] rescue {}
 
-    begin
-      logger.info "创建 #{image_pages_url_filename}"
-      images_page_url_file = File.open(image_pages_url_filename, "wb")
 
-      image_detail_element = content.css(product_page_image_link_css)
+    #   images_url_ary = []
+    #   browser.instance_eval(product_page_little_image_lists_expression).each do |li|
+    #     li.hover
+    #     sleep 0.5
+    #     browser.instance_eval(product_page_image_expression).hover
 
-      image_pages_url =
-        if image_detail_element.search('./@href').empty?
-          image_detail_element.attr('onclick').text[/'(.*?)'/, 1]
-        else
-          image_detail_element.attr('href').text
-        end
+    #     Watir::Wait.until { browser.html.include? product_page_float_image_id }
+    #     url = browser.element(xpath: "//div[contains(@id, \"#{product_page_float_image_id}\")]|//div[contains(@class, \"#{product_page_float_image_id}\")]").img.src
+    #     images_url_ary << url unless images_url_ary.include? url
+    #   end
 
-      images_page_url_file.puts image_pages_url
-    ensure
-      logger.info "正在关闭 #{images_page_url_file.path}"
-      images_page_url_file.close
-    end
+    #   local_images_url_ary = images_url_ary.map {|f| "http://127.0.0.1/#{directory}/#{File.basename(f)}" }
+    #   details_hash.merge!(specs_hash).merge!({
+    #       "商品名称" => name,
+    #       "图片原始链接" => images_url_ary,
+    #       "图片本地链接" => local_images_url_ary
+    #     })
+
+    #   product_detail_file.puts %({"#{id}": #{details_hash.to_json}})
+    #   logger_with_puts "#{label(name)} 抓取完成."
+    # ensure
+    #   logger.info "正在关闭 #{product_detail_file.path}"
+    #   product_detail_file.close
+    # end
   end
 end
 
