@@ -17,30 +17,35 @@ def capture(file)
       next
     end
 
-    product_details_file = File.open("#{directory}/product_details.html", 'wb')
-
-    contents = []
-    browser.goto detail_url
-    counter = 0
-
     begin
-      browser.instance_eval(product_page_little_image_lists_expression).each do |li|
-        li.hover
-        sleep 0.5
-        browser.instance_eval(product_page_image_expression).hover
-        Watir::Wait.until { browser.html.include? product_page_float_image_id }
-        contents << browser.html
-        counter += 1
-        logger_with_puts "成功提取 \033[0;33m#{name}\033[0m 第 #{counter} 张图片."
-      end
-    rescue Net::ReadTimeout, Watir::Wait::TimeoutError
-      logger_with_puts $!.message, :error
-      retry
-    end
+      product_details_file = File.open("#{directory}/product_details.html", 'wb')
 
-    product_details_file.puts contents
-    logger_with_puts "保存产品细节信息到 #{product_details_filename} 成功."
+      contents = []
+      browser.goto detail_url
+      counter = 0
+
+      begin
+        browser.instance_eval(product_page_little_image_lists_expression).each do |li|
+          li.hover
+          sleep 0.5
+          browser.instance_eval(product_page_image_expression).hover
+          Watir::Wait.until { browser.html.include? product_page_float_image_id }
+          contents << browser.html
+          counter += 1
+          logger_with_puts "成功提取 \033[0;33m#{name}\033[0m 第 #{counter} 张图片."
+        end
+      rescue Net::ReadTimeout, Watir::Wait::TimeoutError
+        logger_with_puts $!.message, :error
+        retry
+      end
+
+      product_details_file.puts contents
+      logger_with_puts "保存产品细节信息到 #{product_details_filename}."
+    ensure
+      product_details_file.close unless product_detail_file.nil?
+    end
   end
+  logger_with_puts "提取 #{label($keyword)} 完成."
 end
 
 unless ARGV.empty?
