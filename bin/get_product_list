@@ -10,7 +10,7 @@ def capture
       browser.goto search_page_url_with_pagination + page.to_s
       contents << browser.html
       logger_with_puts "正在收集第 #{page} 页结果."
-    rescue Net::ReadTimeout
+    rescue Net::ReadTimeout, Watir::Wait::TimeoutError
       logger_with_puts $!.message, :error
       retry
     end
