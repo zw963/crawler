@@ -81,7 +81,9 @@ module Common
     # 如果找不到分页 CSS, 便假设只有一页.
     return 1 if element.nil?
 
-    element.text[/\d+/].to_i
+    pages_count = element.text[/\d+/].to_i
+    logger_with_puts "页面总数: #{pages_count}."
+    pages_count
   end
 
   def logger

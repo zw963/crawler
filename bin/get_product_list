@@ -4,6 +4,7 @@ def capture
   csv_file = CSV.open(keyword_csv_filename, "wb")
   contents = []
 
+
   eval(page_number_sequence_expression).each do |page|
     logger.info "正在打开第 #{page} 页."
     begin
@@ -17,7 +18,8 @@ def capture
   end
 
   logger_with_puts "收集完成, 开始对页面结果进行分析."
-  counter = 0
+  page_counter = 0
+  product_counter = 0
   contents.each do |content|
     anchors = Nokogiri.HTML(content).search(product_id_xpath)
 
@@ -34,14 +36,13 @@ def capture
         `echo #{id} > "#{product_dir}"/id`
 
         csv_file << [id, name, detail_page_url]
-        counter += 1
-        logger.info "插入第 #{counter} 条记录."
         id_array << id
+        logger.info "已抓取第 #{product_counter += 1} 条记录."
       end
     end
-    logger_with_puts "#{label($keyword)} 抓取完成."
+    logger_with_puts "已抓取第 #{page_counter += 1} 页."
   end
-  logger_with_puts "关键字: #{keyword_output}, 抓取数量为: #{counter}."
+  logger_with_puts "#{label($keyword)} 抓取完成, 抓取数量为: #{product_counter}."
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."
