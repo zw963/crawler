@@ -78,12 +78,15 @@ module Common
 
   def pages_count
     element = search_page_content.css(search_page_pages_count_css)[0]
-    # 如果找不到分页 CSS, 便假设只有一页.
-    return 1 if element.nil?
-
-    pages_count = element.text[/\d+/].to_i
-    logger_with_puts "页面总数: #{pages_count}."
-    pages_count
+    if element.nil?
+      # 如果找不到分页 CSS, 便假设只有一页.
+      logger_with_puts "找不到分页 CSS, 假设页面总数为 1 页."
+      1
+    else
+      pages_count = element.text[/\d+/].to_i
+      logger_with_puts "报告页面总数: #{pages_count}."
+      pages_count
+    end
   end
 
   def logger
@@ -128,19 +131,6 @@ module Common
     rescue SocketError, Net::ReadTimeout
       logger_with_puts $!.message, :error
       retry
-    end
-  end
-
-  def product_amount
-    element = search_page_content.css(search_page_product_amount_css)[0]
-    raise '请通过浏览器检查产品总数的 css 设定.' if element.nil?
-    product_amount = element.text[/\d+/].to_i
-
-    if product_amount == 0
-      logger_with_puts "#{$keyword} 总数为 0, 取消抓取."
-      throw :exit_capture
-    else
-      logger_with_puts "关键字: #{$keyword}, 总数: #{product_amount}"
     end
   end
 
