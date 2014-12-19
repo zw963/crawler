@@ -35,9 +35,11 @@ def capture
         product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first
         `echo #{id} > "#{product_dir}"/id`
 
-        csv_file << [id, name, detail_page_url]
-        id_array << id
-        logger.info "已抓取第 #{product_counter += 1} 条记录."
+        unless name.empty?
+          csv_file << [id, name, detail_page_url]
+          id_array << id
+          logger.info "已抓取第 #{product_counter += 1} 条记录."
+        end
       end
     end
     logger_with_puts "已抓取第 #{page_counter += 1} 页."
