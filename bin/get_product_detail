@@ -5,9 +5,8 @@ def capture(file)
   logger.info "正在打开 #{$keyword} #{category}页面."
 
   list = CSV.foreach(file) do |csv_array|
-    id = csv_array[0]
-    name = csv_array[1]
-    detail_url = csv_array[2]
+    name = csv_array[0]
+    detail_url = csv_array[1]
 
     directory = "#{home_directory}/#{site}/#{$keyword}/#{name}"
     product_details_filename = "#{directory}/product_details.html"
@@ -18,7 +17,7 @@ def capture(file)
     end
 
     begin
-      product_details_file = File.open("#{directory}/product_details.html", 'wb')
+      product_details_file = File.open(product_details_filename, 'wb')
 
       contents = []
       browser.goto detail_url
@@ -42,7 +41,7 @@ def capture(file)
       product_details_file.puts contents
       logger_with_puts "保存产品细节信息到 #{product_details_filename}."
     ensure
-      product_details_file.close unless product_detail_file.nil?
+      product_details_file.close unless product_details_file.nil?
     end
   end
   logger_with_puts "提取 #{label($keyword)} 完成."

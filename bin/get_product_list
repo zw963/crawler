@@ -32,10 +32,10 @@ def capture
         detail_page_url = detail_page_url.concat('.html') unless detail_page_url =~ /\?/
 
         product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first
-        `echo #{id} > "#{product_dir}"/id`
 
         unless name.empty?
-          csv_file << [id, name, detail_page_url]
+          `echo #{id} > "#{product_dir}"/id`
+          csv_file << [name, detail_page_url]
           id_array << id
           logger.info "已抓取第 #{product_counter += 1} 条记录."
         end
