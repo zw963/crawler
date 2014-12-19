@@ -10,14 +10,14 @@ def capture(file)
     detail_url = csv_array[2]
 
     directory = "#{home_directory}/#{site}/#{$keyword}/#{name}"
-
     product_details_filename = "#{directory}/product_details.html"
-    product_details_file = File.open("#{directory}/product_details.html", 'wb')
 
-    if test 's', product_details_filename
+    if test ?s, product_details_filename
       logger_with_puts "跳过 #{name} #{category}页面抓取 !"
       next
     end
+
+    product_details_file = File.open("#{directory}/product_details.html", 'wb')
 
     contents = []
     browser.goto detail_url
@@ -40,42 +40,6 @@ def capture(file)
 
     product_details_file.puts contents
     logger_with_puts "保存产品细节信息到 #{product_details_filename} 成功."
-    # begin
-    #   logger.info "创建 #{product_detail_filename}"
-    #   product_detail_file = File.open(product_detail_filename, "a+")
-
-    #   details = content.css(product_page_detail_list_css)
-    #   details_hash = Hash[details.map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }] rescue {}
-
-    #   # specs 只有京东才有.
-    #   specs = content.css('div#product-detail-2 table.Ptable tr')
-    #   specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }] rescue {}
-
-
-    #   images_url_ary = []
-    #   browser.instance_eval(product_page_little_image_lists_expression).each do |li|
-    #     li.hover
-    #     sleep 0.5
-    #     browser.instance_eval(product_page_image_expression).hover
-
-    #     Watir::Wait.until { browser.html.include? product_page_float_image_id }
-    #     url = browser.element(xpath: "//div[contains(@id, \"#{product_page_float_image_id}\")]|//div[contains(@class, \"#{product_page_float_image_id}\")]").img.src
-    #     images_url_ary << url unless images_url_ary.include? url
-    #   end
-
-    #   local_images_url_ary = images_url_ary.map {|f| "http://127.0.0.1/#{directory}/#{File.basename(f)}" }
-    #   details_hash.merge!(specs_hash).merge!({
-    #       "商品名称" => name,
-    #       "图片原始链接" => images_url_ary,
-    #       "图片本地链接" => local_images_url_ary
-    #     })
-
-    #   product_detail_file.puts %({"#{id}": #{details_hash.to_json}})
-    #   logger_with_puts "#{label(name)} 抓取完成."
-    # ensure
-    #   logger.info "正在关闭 #{product_detail_file.path}"
-    #   product_detail_file.close
-    # end
   end
 end
 
