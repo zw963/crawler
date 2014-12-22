@@ -35,7 +35,7 @@ def capture
 
         unless name.empty?
           `echo #{id} > "#{product_dir}"/id`
-          csv_file << [name, detail_page_url]
+          csv_file << [id, name, detail_page_url]
           id_array << id
           logger.info "已抓取第 #{product_counter += 1} 条记录."
         end

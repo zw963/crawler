@@ -15,17 +15,19 @@ begin
   product_details_json_file = File.open(product_details_json, "wb")
   product_details_json_file.puts "{\n"
 
-  Dir["#{home_directory}/#{site}/**/product_details.html"].each do |file|
-    pathname = Pathname(file)
-    $keyword = pathname.parent.parent.basename.to_s
-    name = pathname.parent.basename.to_s
-    id = File.read(pathname.parent.join('id')).chomp
+  Dir["#{home_directory}/#{site}/**/product_details.html"].each do |filename|
+    file = File.open(filename)
+    $keyword = File.basename(File.expand_path("../../../", filename))
+    name = File.basename(File.expand_path("../", filename))
+    product_origin_url = file.readline.chomp
     load_site_info
 
     content = Nokogiri.HTML(File.read(file))
     # 产品详细信息.
-    details = content.css(product_page_detail_list_css)
-    details_hash = Hash[details.map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }] rescue {}
+    id = File.read(File.expand_path("../id", filename)).chomp
+    price = content.css(product_page_price_css).first.text.tr('[¥$]', '')
+    average_price = content.css(product_page_average_price_css).first.text
+    details_hash = Hash[content.css(product_page_detail_list_css).map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }] rescue {}
     # 产品规格(specification), 目前仅仅支持京东.
     specs = content.css('div#product-detail-2 table.Ptable tr')
     specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }] rescue {}
@@ -39,9 +41,12 @@ begin
     local_images_url_ary = images_url_ary.map {|f| "#{directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
 
     details_hash.merge!(specs_hash).merge!({
-        "商品名称" => name,
-        "图片原始链接" => images_url_ary,
-        "图片本地链接" => local_images_url_ary
+        '商品名称' => name,
+        '价格' => price,
+        '平均价格' => average_price,
+        '商品原始链接' => product_origin_url,
+        '图片原始链接' => images_url_ary,
+        '图片本地链接' => local_images_url_ary
       })
 
     product_details_json_file.puts %("#{id}": #{details_hash.to_json},)

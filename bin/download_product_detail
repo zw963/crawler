@@ -4,15 +4,20 @@
 def capture(file)
   logger.info "正在打开 #{$keyword} #{category}页面."
 
-  list = CSV.foreach(file) do |csv_array|
-    name = csv_array[0]
-    detail_url = csv_array[1]
+  amount_ary = CSV.readlines(file)
+  amount = amount_ary.count
+  amount_counter = 0
+
+  list = amount_ary.each do |csv_array|
+    logger_with_puts "正在抓取 #{amount_counter += 1}/#{amount}"
+    name = csv_array[1]
+    detail_url = csv_array[2]
 
     directory = "#{home_directory}/#{site}/#{$keyword}/#{name}"
     product_details_filename = "#{directory}/product_details.html"
 
     if test ?s, product_details_filename
-      logger_with_puts "跳过 #{name} #{category}页面抓取 !"
+      logger_with_puts "文件存在, 跳过 \033[0;33m#{name}\033[0m #{category}页面抓取 !"
       next
     end
 
@@ -38,6 +43,7 @@ def capture(file)
         retry
       end
 
+      product_details_file.puts detail_url
       product_details_file.puts contents
       logger_with_puts "保存产品细节信息到 #{product_details_filename}."
     ensure
