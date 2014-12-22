@@ -3,11 +3,12 @@
 require_relative '../lib/common'
 include Common
 
-Dir["#{home_directory}/#{site}/**/images_url.csv"].each_slice(20) do |filenames|
+hash = JSON.parse(File.read("#{home_directory}/#{site}/product_details.json"))
+hash.delete('null')
+
+hash.map {|key, value| value['图片原始链接'].zip value['图片本地链接'] }.flatten(1).each_slice(30) do |filenames|
   filenames.each do |filename|
-    dirname = File.dirname(filename)
-    pic_urls = File.readlines(filename).map(&:chomp).join(' ')
-    spawn("wget -t5 -nc -P \"#{dirname}\" #{pic_urls}")
+    spawn("wget -t5 -nc \"#{filename[0]}\" -O \"#{filename[1]}\"")
   end
-  sleep 10
+  sleep 5
 end

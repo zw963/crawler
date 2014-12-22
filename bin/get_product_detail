@@ -36,7 +36,7 @@ begin
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
 ").map {|x| x.attr('src') }
-    local_images_url_ary = images_url_ary.map {|f| "http://127.0.0.1/#{directory}/#{File.basename(f)}" }
+    local_images_url_ary = images_url_ary.map {|f| "#{directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
 
     details_hash.merge!(specs_hash).merge!({
         "商品名称" => name,
