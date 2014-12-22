@@ -15,9 +15,11 @@ begin
   product_details_json_file = File.open(product_details_json, "wb")
   product_details_json_file.puts "{\n"
 
+  counter = 0
+
   Dir["#{home_directory}/#{site}/**/product_details.html"].each do |filename|
     file = File.open(filename)
-    $keyword = File.basename(File.expand_path("../../../", filename))
+    $keyword = File.basename(File.expand_path("../..", filename))
     name = File.basename(File.expand_path("../", filename))
     product_origin_url = file.readline.chomp
     load_site_info
@@ -37,7 +39,7 @@ begin
 //div[contains(@id, \"#{product_page_float_image_id}\")]/img
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
-").map {|x| x.attr('src') }
+").map {|x| x.attr('src') }.uniq
     local_images_url_ary = images_url_ary.map {|f| "#{directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
 
     details_hash.merge!(specs_hash).merge!({
@@ -50,10 +52,11 @@ begin
       })
 
     product_details_json_file.puts %("#{id}": #{details_hash.to_json},)
+    counter += 1
   end
   logger_with_puts "抓取产品详细信息完成."
 ensure
-  product_details_json_file.puts "\"null\":null\n}"
+  product_details_json_file.puts "\"总数\":#{counter}\n}"
   product_details_json_file.close unless product_details_json_file.nil?
   browser.close unless @browser.nil?
 end
