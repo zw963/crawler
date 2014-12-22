@@ -48,7 +48,7 @@ begin
   end
   logger_with_puts "抓取产品详细信息完成."
 ensure
-  product_details_json_file.puts "\"end\":\"end\"\n}"
+  product_details_json_file.puts "\"null\":null\n}"
   product_details_json_file.close unless product_details_json_file.nil?
   browser.close unless @browser.nil?
 end
