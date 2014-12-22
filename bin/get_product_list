@@ -27,7 +27,7 @@ def capture
     anchors.each do |anchor|
       id = anchor.attr(product_id_attribute)
       unless id_array.include? id
-        name = anchor.instance_eval(search_page_product_name_expression).text.strip.tr('/', "\uff0f")
+        name = anchor.instance_eval(search_page_product_name_expression).text.strip.tr_s(' ', ' ').tr('/', "\uff0f")
         detail_page_url = search_page_product_detail_url + id.to_s
         detail_page_url = detail_page_url.concat('.html') unless detail_page_url =~ /\?/
 
