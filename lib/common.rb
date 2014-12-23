@@ -104,6 +104,10 @@ module Common
     ENV['SITE']
   end
 
+  def site_directory
+    "#{home_directory}/#{site}"
+  end
+
   def category
     tags[1]
   end
@@ -138,7 +142,7 @@ module Common
   def keyword_csv_filename
     fail '不存在抓取关键字!' if $keyword.nil?
 
-    keyword_csv_filename = "#{home_directory}/#{site}/#{$keyword}.csv"
+    keyword_csv_filename = "#{site_directory}/#{$keyword}.csv"
 
     if test 's', keyword_csv_filename
       logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"

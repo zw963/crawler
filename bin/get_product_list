@@ -31,7 +31,7 @@ def capture
         detail_page_url = search_page_product_detail_url + id.to_s
         detail_page_url = detail_page_url.concat('.html') unless detail_page_url =~ /\?/
 
-        product_dir = FileUtils.mkdir_p("#{home_directory}/#{site}/#{$keyword}/#{name}").first
+        product_dir = FileUtils.mkdir_p("#{site_directory}/#{$keyword}/#{name}").first
 
         unless name.empty?
           `echo #{id} > "#{product_dir}"/id`
@@ -63,11 +63,9 @@ unless test 's', keywords_filename
 end
 
 begin
-  File.foreach(keywords_filename).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
-    $keyword = keyword
-    load_site_info
-    catch(:exit_capture) { capture }
-  end
+  $keyword = ENV['CRAWLER_KEYWORD']
+  load_site_info
+  catch(:exit_capture) { capture }
 ensure
   browser.close unless @browser.nil?
 end

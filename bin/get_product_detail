@@ -9,15 +9,14 @@ require_relative '../lib/common'
 include Common
 
 begin
-  directory = "#{home_directory}/#{site}"
-  product_details_json = "#{directory}/product_details.json"
+  product_details_json = "#{site_directory}/product_details.json"
   puts "创建 #{product_details_json}"
   product_details_json_file = File.open(product_details_json, "wb")
   product_details_json_file.puts "{\n"
 
   counter = 0
 
-  Dir["#{home_directory}/#{site}/**/product_details.html"].each do |filename|
+  Dir["#{site_directory}/**/product_details.html"].each do |filename|
     file = File.open(filename)
     $keyword = File.basename(File.expand_path("../..", filename))
     name = File.basename(File.expand_path("../", filename))
@@ -40,7 +39,7 @@ begin
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
 ").map {|x| x.attr('src') }.uniq
-    local_images_url_ary = images_url_ary.map {|f| "#{directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
+    local_images_url_ary = images_url_ary.map {|f| "#{site_directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
 
     details_hash.merge!(specs_hash).merge!({
         '商品名称' => name,
@@ -56,7 +55,8 @@ begin
   end
   logger_with_puts "抓取产品详细信息完成."
 ensure
-  product_details_json_file.puts "\"总数\":#{counter}\n}"
-  product_details_json_file.close unless product_details_json_file.nil?
-  browser.close unless @browser.nil?
+  unless product_details_json_file.nil?
+    product_details_json_file.puts "\"总数\":#{counter}\n}"
+    product_details_json_file.close
+  end
 end

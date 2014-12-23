@@ -13,7 +13,7 @@ def capture(file)
     name = csv_array[1]
     detail_url = csv_array[2]
 
-    directory = "#{home_directory}/#{site}/#{$keyword}/#{name}"
+    directory = "#{site_directory}/#{$keyword}/#{name}"
     product_details_filename = "#{directory}/product_details.html"
 
     if test ?s, product_details_filename
@@ -63,12 +63,9 @@ require_relative '../lib/common'
 include Common
 
 begin
-  Dir["#{home_directory}/#{site}/*.csv"].each do |file|
-    $keyword = File.basename(file, '.csv')
-    load_site_info
-
-    capture(file)
-  end
+  $keyword = ENV['CRAWLER_KEYWORD']
+  load_site_info
+  capture("#{site_directory}/#{$keyword}.csv")
 ensure
   browser.close unless @browser.nil?
 end

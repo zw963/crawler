@@ -3,7 +3,7 @@
 require_relative '../lib/common'
 include Common
 
-hash = JSON.parse(File.read("#{home_directory}/#{site}/product_details.json"))
+hash = JSON.parse(File.read("#{site_directory}/product_details.json"))
 hash.delete('总数')
 
 hash.map {|key, value| value['图片原始链接'].zip value['图片本地链接'] }.flatten(1).each_slice(30) do |filenames|
