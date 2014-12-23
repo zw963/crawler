@@ -28,7 +28,11 @@ begin
     id = File.read(File.expand_path("../id", filename)).chomp
     price = content.css(product_page_price_css).first.text.tr('[¥$]', '')
     average_price = content.css(product_page_average_price_css).first.text
-    details_hash = Hash[content.css(product_page_detail_list_css).map {|e| e.text.split(/：|:/) }.select {|x| x.size == 2 }] rescue {}
+    details_ary = content.css(product_page_detail_list_css)
+      .map {|e| e.text.split(/：|:/) }
+      .select {|e| e.size == 2 }
+      .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] } rescue {}
+    details_hash = Hash[details_ary]
     # 产品规格(specification), 目前仅仅支持京东.
     specs = content.css('div#product-detail-2 table.Ptable tr')
     specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }] rescue {}
