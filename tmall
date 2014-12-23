@@ -1,5 +1,5 @@
 #!/bin/sh
 
-export SITE='天猫'
+export CRAWLER_SITE=天猫
 
 $(dirname `which $0`)/bin/crawler

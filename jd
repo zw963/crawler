@@ -1,5 +1,5 @@
 #!/bin/sh
 
-export SITE='京东'
+export CRAWLER_SITE=京东
 
 $(dirname `which $0`)/bin/crawler

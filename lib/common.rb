@@ -101,7 +101,7 @@ module Common
   end
 
   def site
-    ENV['SITE']
+    ENV['CRAWLER_SITE']
   end
 
   def site_directory
