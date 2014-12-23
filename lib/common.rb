@@ -50,7 +50,7 @@ module Common
   end
 
   def log_name
-    log_name = "#{home_directory}/log/#{$keyword}/#{site}_#{tags.join('_')}.log"
+    log_name = "#{home_directory}/log/#{site}/#{$keyword}_#{tags.join('_')}.log"
     FileUtils.mkdir_p(File.dirname(log_name))
     log_name
   end

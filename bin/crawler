@@ -6,8 +6,7 @@ current_directory = File.expand_path('..', __FILE__)
 
 File.foreach(keywords_file).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
   ENV['CRAWLER_KEYWORD'] = keyword
-  system "#{current_directory}/get_product_list"
-  system "#{current_directory}/download_product_detail"
-  system "#{current_directory}/get_product_detail"
-  system "#{current_directory}/image_downloader"
+  system "#{current_directory}/get_product_list && #{current_directory}/download_product_detail"
 end
+
+system "#{current_directory}/get_product_detail && #{current_directory}/image_downloader"

@@ -12,8 +12,8 @@ class Browser
 
     if ENV['CHROME_PATH']
       Selenium::WebDriver::Chrome.path = ENV['CHROME_PATH']
-      Watir.default_timeout = 30
-      Watir::Dom::Wait.timeout = 10
+      Watir.default_timeout = 10
+      Watir::Dom::Wait.timeout = 5
       @browser = Watir::Browser.new(:chrome)
     else
       puts '没有设定 $CHROME_PATH 环境变量, 使用默认驱动 Firefox. (Chrome 会快很多!)'

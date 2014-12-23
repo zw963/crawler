@@ -27,7 +27,7 @@ begin
     # 产品详细信息.
     id = File.read(File.expand_path("../id", filename)).chomp
     price = content.css(product_page_price_css).first.text.tr('[¥$]', '')
-    average_price = content.css(product_page_average_price_css).first.text
+    average_price = content.css(product_page_average_price_css).first.text rescue ''
     details_ary = content.css(product_page_detail_list_css)
       .map {|e| e.text.split(/：|:/) }
       .select {|e| e.size == 2 }

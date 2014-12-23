@@ -31,12 +31,24 @@ def capture(file)
       begin
         browser.instance_eval(product_page_little_image_lists_expression).each do |li|
           li.hover
-          browser.instance_eval(product_page_image_expression).when_dom_changed do |dom|
+          browser.instance_eval(product_page_image_expression).when_dom_changed(timeout: 2) do |dom|
             dom.hover
-            Watir::Wait.until { browser.html.include? product_page_float_image_id }
-            contents << browser.html
-            counter += 1
-            logger_with_puts "成功提取 \033[0;33m#{name}\033[0m 第 #{counter} 张图片."
+            tries = 0
+            begin
+              tries += 1
+              Watir::Wait.until(5) { browser.html.include? product_page_float_image_id }
+              contents << browser.html
+              counter += 1
+              logger_with_puts "成功提取 \033[0;33m#{name}\033[0m 第 #{counter} 张图片."
+            rescue Net::ReadTimeout, Watir::Wait::TimeoutError
+              if tries < 3
+                logger_with_puts $!.message, :error
+                retry
+              else
+                logger_with_puts "重试三次失败, 跳过一张图片抓取."
+                next
+              end
+            end
           end
         end
       rescue Net::ReadTimeout, Watir::Wait::TimeoutError
