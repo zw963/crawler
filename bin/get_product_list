@@ -44,8 +44,6 @@ def capture
     logger_with_puts "已抓取第 #{page_counter += 1} 页."
   end
   logger_with_puts "#{label($keyword)} 抓取完成, 抓取数量为: #{product_counter}."
-  logger_with_puts "等待 30 秒 ..."
-  sleep 30
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."
