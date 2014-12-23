@@ -1,3 +1,9 @@
+文件名映射:
+  product: 产品
+  image: 图片
+  detail: 信息
+  list: 列表
+  downloader: 下载器
 京东:
   search_page_url_with_pagination: http://search.jd.com/Search?keyword=<%= escaped_utf8_keyword %>&enc=utf-8&page=
   search_page_product_amount_css: div.total span strong
@@ -6,8 +12,9 @@
   search_page_product_detail_url: http://item.jd.com/
   page_number_sequence_expression: (1..2*pages_count-1).step(2)
   product_id_xpath: //li[@sku]
-  product_page_price_css: dl#J_StrPriceModBox dd span.tm-price
-  product_page_average_price_css: dl#J_StrPriceModBox dd span.tm-price-item
+  product_page_product_name_css:
+  product_page_product_price_css:
+  product_page_product_average_price_css:
   product_page_detail_list_css: div#product-detail-1 ul.detail-list li
   product_page_little_image_lists_expression: 'div(id: "spec-list").div(class: "spec-items").ul(class: "lh").lis'
   product_page_image_expression: 'div(id: "spec-n1").img'
@@ -20,8 +27,9 @@
   search_page_product_detail_url: http://detail.tmall.com/item.htm?id=
   page_number_sequence_expression: 1..pages_count
   product_id_xpath: //div[@data-id]
-  product_page_price_css: dl#J_StrPriceModBox dd span.tm-price
-  product_page_average_price_css: dl#J_StrPriceModBox dd span.tm-price-item
+  product_page_product_name_css: div.tb-detail-hd h1
+  product_page_product_price_css: dl#J_StrPriceModBox dd span.tm-price
+  product_page_product_average_price_css: dl#J_StrPriceModBox dd span.tm-price-item
   product_page_detail_list_css: ul#J_AttrUL li
   product_page_little_image_lists_expression: 'ul(id: "J_UlThumb").lis'
   product_page_image_expression: 'img(id: "J_ImgBooth")'

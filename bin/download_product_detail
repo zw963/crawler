@@ -37,17 +37,18 @@ def capture(file)
             begin
               tries += 1
               Watir::Wait.until(5) { browser.html.include? product_page_float_image_id }
-              contents << browser.html
               counter += 1
               logger_with_puts "成功提取 \033[0;33m#{name}\033[0m 第 #{counter} 张图片."
             rescue Net::ReadTimeout, Watir::Wait::TimeoutError
-              if tries < 3
-                logger_with_puts $!.message, :error
+              if tries <= 2
+                logger_with_puts $!.message+", 重试第 #{tries} 次", :error
                 retry
               else
-                logger_with_puts "重试三次失败, 跳过一张图片抓取."
+                logger_with_puts "获取大图失败. 查看 #{detail_url} 了解详细信息.", :error
                 next
               end
+            ensure
+              contents << browser.html
             end
           end
         end

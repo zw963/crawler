@@ -26,16 +26,18 @@ begin
     content = Nokogiri.HTML(File.read(file))
     # 产品详细信息.
     id = File.read(File.expand_path("../id", filename)).chomp
-    price = content.css(product_page_price_css).first.text.tr('[¥$]', '')
-    average_price = content.css(product_page_average_price_css).first.text rescue ''
+    product_name = content.css(product_page_product_name_css).first.text.strip.tr_s(' ', ' ')
+    price = content.css(product_page_product_price_css).first.text.tr('[¥$]', '')
+    average_price = content.css(product_page_product_average_price_css).first.text rescue ''
     details_ary = content.css(product_page_detail_list_css)
       .map {|e| e.text.split(/：|:/) }
       .select {|e| e.size == 2 }
-      .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] } rescue {}
+      .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] }
     details_hash = Hash[details_ary]
     # 产品规格(specification), 目前仅仅支持京东.
-    specs = content.css('div#product-detail-2 table.Ptable tr')
-    specs_hash = Hash[specification[2..-1].map {|e| [e.children[0].text, e.children[1].text] }] rescue {}
+    specs_ary = content.css('div#product-detail-2 table.Ptable tr')[2..-1]
+      .map {|e| [e.children[0].text, e.children[1].text] } rescue []
+    specs_hash = Hash[specs_ary]
     # 产品的大图 url.
     images_url_ary =
       content.search("
@@ -46,7 +48,7 @@ begin
     local_images_url_ary = images_url_ary.map {|f| "#{site_directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
 
     details_hash.merge!(specs_hash).merge!({
-        '商品名称' => name,
+        '商品名称' => product_name,
         '价格' => price,
         '平均价格' => average_price,
         '商品原始链接' => product_origin_url,

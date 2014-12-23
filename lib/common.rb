@@ -17,12 +17,15 @@ module Common
   end
 
   def load_site_info
-    site_info = YAML.load(ERB.new(site_yml_content).result(binding))[site]
+    content = YAML.load(ERB.new(site_yml_content).result(binding))
+    site_hash = content[site]
+    filename_map_hash = content['文件名映射']
 
-    if site_info.is_a? Hash
-      site_info.each_pair do |k, v|
+    if site_hash.is_a? Hash and filename_map_hash.is_a? Hash
+      site_hash.each_pair do |k, v|
         self.class.class_eval { define_method(k) { v } }
       end
+      self.class.class_eval { define_method(:filename_map_hash) { filename_map_hash } }
     else
       logger_with_puts '未指定该站点 yml 信息, 请首先编辑 site.yml 细节.'
       exit
@@ -63,18 +66,8 @@ module Common
     @browser ||= Browser.instance
   end
 
-  def hash_map
-    {
-      'product' => '产品',
-      'image' => '图片',
-      'detail' => '信息',
-      'list' => '列表',
-      'downloader' => '下载器'
-    }
-  end
-
   def product_id_attribute
-    product_id_xpath[/@([\w\-_]+)/,1]
+    product_id_xpath[/@([\w\-_]+)/, 1]
   end
 
   def pages_count
@@ -157,6 +150,6 @@ module Common
 
   private
   def tags
-    @tags ||= $0.split('_').compact.map {|e| hash_map[e] }.compact
+    @tags ||= $0.split('_').compact.map {|e| filename_map_hash[e] }.compact
   end
 end
