@@ -4,8 +4,12 @@ def capture
   csv_file = CSV.open(keyword_csv_filename, "wb")
   contents = []
 
-  eval(page_number_sequence_expression).each do |page|
+  pages_array = eval(page_number_sequence_expression).to_a
+
+  until pages_array.empty?
+    page = pages_array.delete(pages_array.sample)
     logger.info "正在打开第 #{page} 页."
+
     begin
       browser.goto search_page_url_with_pagination + page.to_s
       contents << browser.html
