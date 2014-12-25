@@ -78,6 +78,13 @@ include Common
 begin
   $keyword = ENV['CRAWLER_KEYWORD']
   load_site_info
+  csv = "#{site_directory}/#{$keyword}.csv"
+
+  unless test ?s, csv
+    logger_with_puts "#{csv} 不存在! 跳过产品细节提取."
+    exit 1
+  end
+
   capture("#{site_directory}/#{$keyword}.csv")
 ensure
   browser.close unless @browser.nil?
