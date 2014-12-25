@@ -11,6 +11,7 @@ def capture
     logger.info "正在打开第 #{page} 页."
 
     begin
+      browser.reset!
       browser.goto search_page_url_with_pagination + page.to_s
       contents << browser.html
       logger_with_puts "正在收集第 #{page} 页结果."

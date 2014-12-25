@@ -119,6 +119,7 @@ module Common
     return content unless content.nil?
 
     begin
+      browser.reset!
       browser.goto(search_page_url_with_pagination + '1')
       content = Nokogiri::HTML(browser.html)
       if content.blank?
