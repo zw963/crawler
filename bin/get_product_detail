@@ -27,8 +27,8 @@ begin
       content = Nokogiri.HTML(File.read(file))
       # 产品详细信息.
       id = File.read(File.expand_path("../id", filename)).chomp
-      product_name = content.css(product_page_product_name_css).first.text.strip.tr_s(' ', ' ')
-      price = content.css(product_page_product_price_css).first.text.tr('[¥$]', '')
+      product_name = content.css(product_page_product_name_css).first.text.strip.tr_s(' ', ' ') rescue ''
+      price = content.css(product_page_product_price_css).first.text.tr('[¥$]', '') rescue ''
       average_price = content.css(product_page_product_average_price_css).first.text rescue ''
       details_ary = content.css(product_page_detail_list_css)
         .map {|e| e.text.split(/：|:/) }
