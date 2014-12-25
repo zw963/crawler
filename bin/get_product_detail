@@ -17,47 +17,52 @@ begin
   counter = 0
 
   Dir["#{site_directory}/**/product_details.html"].each do |filename|
-    file = File.open(filename)
-    $keyword = File.basename(File.expand_path("../..", filename))
-    name = File.basename(File.expand_path("../", filename))
-    product_origin_url = file.readline.chomp
-    load_site_info
+    begin
+      file = File.open(filename)
+      $keyword = File.basename(File.expand_path("../..", filename))
+      name = File.basename(File.expand_path("../", filename))
+      product_origin_url = file.readline.chomp
+      load_site_info
 
-    content = Nokogiri.HTML(File.read(file))
-    # 产品详细信息.
-    id = File.read(File.expand_path("../id", filename)).chomp
-    product_name = content.css(product_page_product_name_css).first.text.strip.tr_s(' ', ' ')
-    price = content.css(product_page_product_price_css).first.text.tr('[¥$]', '')
-    average_price = content.css(product_page_product_average_price_css).first.text rescue ''
-    details_ary = content.css(product_page_detail_list_css)
-      .map {|e| e.text.split(/：|:/) }
-      .select {|e| e.size == 2 }
-      .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] }
-    details_hash = Hash[details_ary]
-    # 产品规格(specification), 目前仅仅支持京东.
-    specs_ary = content.css('div#product-detail-2 table.Ptable tr')[2..-1]
-      .map {|e| [e.children[0].text, e.children[1].text] } rescue []
-    specs_hash = Hash[specs_ary]
-    # 产品的大图 url.
-    images_url_ary =
-      content.search("
+      content = Nokogiri.HTML(File.read(file))
+      # 产品详细信息.
+      id = File.read(File.expand_path("../id", filename)).chomp
+      product_name = content.css(product_page_product_name_css).first.text.strip.tr_s(' ', ' ')
+      price = content.css(product_page_product_price_css).first.text.tr('[¥$]', '')
+      average_price = content.css(product_page_product_average_price_css).first.text rescue ''
+      details_ary = content.css(product_page_detail_list_css)
+        .map {|e| e.text.split(/：|:/) }
+        .select {|e| e.size == 2 }
+        .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] }
+      details_hash = Hash[details_ary]
+      # 产品规格(specification), 目前仅仅支持京东.
+      specs_ary = content.css('div#product-detail-2 table.Ptable tr')[2..-1]
+        .map {|e| [e.children[0].text, e.children[1].text] } rescue []
+      specs_hash = Hash[specs_ary]
+      # 产品的大图 url.
+      images_url_ary =
+        content.search("
 //div[contains(@id, \"#{product_page_float_image_id}\")]/img
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
 ").map {|x| x.attr('src') }.uniq
-    local_images_url_ary = images_url_ary.map {|f| "#{site_directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
+      local_images_url_ary = images_url_ary.map {|f| "#{site_directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
 
-    details_hash.merge!(specs_hash).merge!({
-        '商品名称' => product_name,
-        '价格' => price,
-        '平均价格' => average_price,
-        '商品原始链接' => product_origin_url,
-        '图片原始链接' => images_url_ary,
-        '图片本地链接' => local_images_url_ary
-      })
+      details_hash.merge!(specs_hash).merge!({
+          '商品名称' => product_name,
+          '价格' => price,
+          '平均价格' => average_price,
+          '商品原始链接' => product_origin_url,
+          '图片原始链接' => images_url_ary,
+          '图片本地链接' => local_images_url_ary
+        })
 
-    product_details_json_file.puts %("#{id}": #{details_hash.to_json},)
-    counter += 1
+      product_details_json_file.puts %("#{id}": #{details_hash.to_json},)
+      counter += 1
+    rescue
+      logger_with_puts "创建 json 文件失败. 查看 #{product_origin_url} 了解详细信息.", :error
+      raise
+    end
   end
   logger_with_puts "抓取产品详细信息完成."
 ensure
