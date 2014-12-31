@@ -83,13 +83,17 @@ module Common
     end
   end
 
+  def keyword_symbol
+      $keyword.tr(' ', '_')
+  end
+
   def logger
-    logger = eval("$#{$keyword}_logger")
+    logger = eval("$#{keyword_symbol}_logger")
 
     if logger
       logger
     else
-      eval "$#{$keyword}_logger = KeywordLogger.logger"
+      eval "$#{keyword_symbol}_logger = KeywordLogger.logger"
     end
   end
 
@@ -115,7 +119,7 @@ module Common
   end
 
   def search_page_content
-    content = instance_variable_get(:"@#{$keyword}_search_page_content")
+    content = instance_variable_get(:"@#{keyword_symbol}_search_page_content")
     return content unless content.nil?
 
     begin
@@ -125,7 +129,7 @@ module Common
       if content.blank?
         raise SocketError
       else
-        instance_variable_set(:"@#{$keyword}_search_page_content", content)
+        instance_variable_set(:"@#{keyword_symbol}_search_page_content", content)
       end
     rescue SocketError, Net::ReadTimeout
       logger_with_puts $!.message, :error
