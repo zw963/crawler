@@ -84,7 +84,7 @@ module Common
   end
 
   def keyword_symbol
-      $keyword.tr(' ', '_')
+    $keyword.tr(' ', "\u00a0").tr('/', "\uff0f")
   end
 
   def logger
