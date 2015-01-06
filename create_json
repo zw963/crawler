@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export CRAWLER_SITE=天猫
+
+current_directory=$(dirname `which $0`)
+
+$current_directory/bin/get_product_detail
+$current_directory/bin/image_downloader
