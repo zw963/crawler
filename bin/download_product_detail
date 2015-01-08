@@ -13,7 +13,7 @@ def capture(file)
     name = csv_array[1]
     detail_url = csv_array[2]
 
-    directory = "#{site_directory}/#{$keyword}/#{name}"
+    directory = "#{keyword_directory}/#{name}"
     product_details_filename = "#{directory}/product_details.html"
 
     if test ?s, product_details_filename
@@ -78,14 +78,14 @@ include Common
 begin
   $keyword = ENV['CRAWLER_KEYWORD']
   load_site_info
-  csv = "#{site_directory}/#{$keyword}.csv"
+  csv = "#{keyword_directory}.csv"
 
   unless test ?s, csv
     logger_with_puts "#{csv} 不存在! 跳过产品细节提取."
     exit 1
   end
 
-  capture("#{site_directory}/#{$keyword}.csv")
+  capture("#{keyword_directory}.csv")
 ensure
   browser.close unless @browser.nil?
 end

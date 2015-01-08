@@ -1,10 +1,5 @@
 #!/usr/bin/env ruby
 
-unless ARGV.empty?
-  logger_with_puts logger_with_puts "必须首先使用 \033[0;33m./get_jd_product_list\033[0m 生成抓取列表."
-  exit 1
-end
-
 require_relative '../lib/common'
 include Common
 
@@ -19,7 +14,7 @@ begin
   Dir["#{site_directory}/**/product_details.html"].each do |filename|
     begin
       file = File.open(filename)
-      $keyword = File.basename(File.expand_path("../..", filename))
+      $keyword = File.basename(File.expand_path("../..", filename)).tr("\u00a0", ' ').tr("\uff0f", '/')
       name = File.basename(File.expand_path("../", filename))
       product_origin_url = file.readline.chomp
       load_site_info
@@ -33,7 +28,7 @@ begin
       details_ary = content.css(product_page_detail_list_css)
         .map {|e| e.text.split(/：|:/) }
         .select {|e| e.size == 2 }
-        .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] }
+        .map {|e| [e[0], e[1].strip.tr("\u00a0", '')] }       # 移除内容前后多余的空格
       details_hash = Hash[details_ary]
       # 产品规格(specification), 目前仅仅支持京东.
       specs_ary = content.css('div#product-detail-2 table.Ptable tr')[2..-1]
@@ -46,7 +41,7 @@ begin
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
 ").map {|x| x.attr('src') }.uniq
-      local_images_url_ary = images_url_ary.map {|f| "#{site_directory}/#{$keyword}/#{name}/#{File.basename(f)}" }
+      local_images_url_ary = images_url_ary.map {|f| "#{keyword_directory}/#{name}/#{File.basename(f)}" }
 
       details_hash.merge!(specs_hash).merge!({
           '商品名称' => product_name,
@@ -64,7 +59,7 @@ begin
       raise
     end
   end
-  logger_with_puts "抓取产品详细信息完成."
+  logger_with_puts "创建 json 完成."
 ensure
   unless product_details_json_file.nil?
     product_details_json_file.puts "\"总数\":#{counter}\n}"

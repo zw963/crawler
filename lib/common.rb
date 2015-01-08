@@ -105,6 +105,10 @@ module Common
     "#{home_directory}/#{site}"
   end
 
+  def keyword_directory
+    "#{site_directory}/#{keyword_symbol}"
+  end
+
   def category
     tags[1]
   end
@@ -140,14 +144,14 @@ module Common
   def keyword_csv_filename
     fail '不存在抓取关键字!' if $keyword.nil?
 
-    keyword_csv_filename = "#{site_directory}/#{$keyword.tr('/', "\uff0f")}.csv"
+    keyword_csv_filename = "#{keyword_directory}.csv"
 
     if test 's', keyword_csv_filename
       logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"
       throw :exit_capture
     end
 
-    FileUtils.mkdir_p("#{home_directory}/#{site}")
+    FileUtils.mkdir_p(site_directory)
     logger.info "打开 #{keyword_csv_filename}"
 
     keyword_csv_filename
