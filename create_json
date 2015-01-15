@@ -3,4 +3,4 @@
 export CRAWLER_SITE=天猫
 
 cd $(dirname `which $0`)
-bin/get_product_detail &&  bin/image_downloader
+bin/get_product_detail

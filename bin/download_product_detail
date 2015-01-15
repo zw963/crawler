@@ -17,7 +17,7 @@ def capture(file)
     product_details_filename = "#{directory}/product_details.html"
 
     if test ?s, product_details_filename
-      logger_with_puts "文件存在, 跳过 \033[0;33m#{name}\033[0m #{category}页面抓取 !"
+      logger.info "文件存在, 跳过 \033[0;33m#{name}\033[0m #{category}页面抓取 !"
       next
     end
 
@@ -64,7 +64,7 @@ def capture(file)
       product_details_file.close unless product_details_file.nil?
     end
   end
-  logger_with_puts "提取 #{label($keyword)} 完成."
+  logger_with_puts "提取 \033[0;33m#$keyword\033[0m #{category}#{task} 完成."
 end
 
 unless ARGV.empty?

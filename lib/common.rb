@@ -40,20 +40,8 @@ module Common
     CGI.escape($keyword.encode('gb2312', 'utf-8'))
   end
 
-  def keywords_filename
-    "#{home_directory}/config/keywords.txt"
-  end
-
-  def keyword_output
-    "\033[0;33m#{$keyword}\033[0m"
-  end
-
-  def label(keyword)
-    "\033[0;33m#{keyword}\033[0m #{category}#{task}"
-  end
-
   def log_name
-    log_name = "#{home_directory}/log/#{site}/#{$keyword}_#{tags.join('_')}.log"
+    log_name = "#{home_directory}/log/#{site}/#{keyword_name}_#{tags.join('_')}.log"
     FileUtils.mkdir_p(File.dirname(log_name))
     log_name
   end
@@ -83,12 +71,18 @@ module Common
     end
   end
 
+  def keyword_name
+    fail '不存在抓取关键字!' if $keyword.nil?
+
+    $keyword.tr('/', "\uff0f").rstrip
+  end
+
   def keyword_symbol
-    $keyword.tr(' ', "\u00a0").tr('/', "\uff0f").tr('$', "\ufe69").tr('&', "\uff06").tr('-', "\uff0d").rstrip
+    keyword_name.tr(' ', "\u00a0").tr('$', "\ufe69").tr('&', "\uff06").tr('-', "\uff0d")
   end
 
   def keyword_directory
-    "#{site_directory}/#{$keyword.tr(' ', "\u00a0").tr('/', "\uff0f")}"
+    "#{site_directory}/#{keyword_name}"
   end
 
   def logger
@@ -142,8 +136,6 @@ module Common
   end
 
   def keyword_csv_filename
-    fail '不存在抓取关键字!' if $keyword.nil?
-
     keyword_csv_filename = "#{keyword_directory}.csv"
 
     if test 's', keyword_csv_filename
