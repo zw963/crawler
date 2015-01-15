@@ -84,7 +84,11 @@ module Common
   end
 
   def keyword_symbol
-    $keyword.tr(' ', "\u00a0").tr('/', "\uff0f")
+    $keyword.tr(' ', "\u00a0").tr('/', "\uff0f").tr('$', "\ufe69").tr('&', "\uff06").tr('-', "\uff0d").rstrip
+  end
+
+  def keyword_directory
+    "#{site_directory}/#{$keyword.tr(' ', "\u00a0").tr('/', "\uff0f")}"
   end
 
   def logger
@@ -103,10 +107,6 @@ module Common
 
   def site_directory
     "#{home_directory}/#{site}"
-  end
-
-  def keyword_directory
-    "#{site_directory}/#{keyword_symbol}"
   end
 
   def category
