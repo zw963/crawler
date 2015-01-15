@@ -7,9 +7,10 @@ begin
   product_details_json = "#{site_directory}/product_details.json"
   puts "创建 #{product_details_json}"
   product_details_json_file = File.open(product_details_json, "wb")
-  product_details_json_file.puts "{\n"
+  product_details_json_file.puts "[\n"
 
-  counter = 0
+  product_counter = 0
+  image_counter = 0
 
   Dir["#{site_directory}/**/product_details.html"].each do |filename|
     begin
@@ -53,8 +54,9 @@ begin
           '图片本地链接' => local_images_url_ary
         })
 
-      counter += 1
-      product_details_json_file.puts %("#{counter}": #{details_hash.to_json},)
+      product_counter += 1
+      image_counter += local_images_url_ary.count
+      product_details_json_file.puts %(#{details_hash.to_json},)
     rescue
       logger_with_puts "创建 json 文件失败. 查看 #{product_origin_url} 了解详细信息.", :error
       raise
@@ -63,7 +65,7 @@ begin
   logger_with_puts "创建 json 完成."
 ensure
   unless product_details_json_file.nil?
-    product_details_json_file.puts "\"总数\":#{counter}\n}"
+    product_details_json_file.puts "{\"产品数量\": #{product_counter}, \"图片数量\": #{image_counter}}\n]"
     product_details_json_file.close
   end
 end
