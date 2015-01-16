@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+# 重命名脚本.
+
+Dir[File.expand_path("#{__dir__}/../天猫/*")].each do |name|
+  new_name = name.tr("\u00a0", ' ')
+
+  if new_name != name
+    system "mv -v '#{name}' '#{new_name}'"
+  end
+end
