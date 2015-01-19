@@ -5,10 +5,10 @@ require 'json'
 Dir['**/product_details_*.json'].each do |json_file|
   ary = JSON.parse(File.read(json_file))
 
-  ary.map {|e| e['图片原始链接'].zip e['图片本地链接'] }.flatten(1).each_slice(20) do |filenames|
+  ary.map {|e| e['图片原始链接'].zip e['图片本地链接'] }.flatten(1).reject {|k, v| File.exist?(v) }.each_slice(30) do |filenames|
     filenames.each do |filename|
       spawn("wget -t5 -nc \"#{filename[0]}\" -O \"#{filename[1]}\"")
     end
-    sleep 5
+    sleep 5 if filenames.count > 10
   end
 end
