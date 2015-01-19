@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'json'
+
 Dir['**/product_details_*.json'].each do |json_file|
   ary = JSON.parse(File.read(json_file))
 

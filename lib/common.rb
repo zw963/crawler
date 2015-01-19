@@ -7,6 +7,7 @@ require 'watir-dom-wait'
 require 'uri'
 require 'json'
 require 'erb'
+require 'pathname'
 
 require_relative 'browser'
 require_relative 'keyword_logger'
