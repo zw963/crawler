@@ -67,7 +67,7 @@ module Common
       1
     else
       pages_count = element.text[/\d+/].to_i
-      logger_with_puts "报告页面总数: #{pages_count}."
+      logger_with_puts "当前分类: \033[0;33m#$keyword\033[0m, 报告页面总数: #{pages_count}."
       pages_count
     end
   end
@@ -136,7 +136,7 @@ module Common
     keyword_csv_filename = "#{$keyword_directory}.csv"
 
     if test 's', keyword_csv_filename
-      logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"
+      logger_with_puts "跳过 \033[0;32m#{keyword_csv_filename}\033[0m !"
       throw :exit_capture
     end
 

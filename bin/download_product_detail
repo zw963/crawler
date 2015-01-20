@@ -9,17 +9,17 @@ def capture(file)
   amount_counter = 0
 
   list = amount_ary.each do |csv_array|
-    logger_with_puts "正在抓取 #{amount_counter += 1}/#{amount}"
     name = csv_array[1]
     detail_url = csv_array[2]
-
     directory = "#{$keyword_directory}/#{name}"
     product_details_filename = "#{directory}/product_details.html"
 
     if test ?s, product_details_filename
-      logger.info "文件存在, 跳过 \033[0;33m#{name}\033[0m #{category}页面抓取 !"
+      logger_with_puts "跳过 \033[0;33m#{name}\033[0m !"
       next
     end
+
+    logger_with_puts "正在抓取 #{amount_counter += 1}/#{amount}"
 
     begin
       product_details_file = File.open(product_details_filename, 'wb')
@@ -80,6 +80,7 @@ begin
   $keyword_directory = ENV['CRAWLER_KEYWORD_DIRECTORY']
 
   load_site_info
+
   csv = "#{$keyword_directory}.csv"
 
   unless test ?s, csv

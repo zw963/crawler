@@ -40,6 +40,7 @@ def extract_info(detail_html)
   details_hash.merge!(specs_hash).merge!({
       '原始商品id' => id,
       '商品名称' => product_name,
+      '图片来源' => ENV['CRAWLER_SITE'],
       '价格' => price,
       '平均价格' => average_price,
       '商品原始链接' => product_origin_url,
@@ -62,7 +63,7 @@ json_file_no = 1
 
 Dir["#{site_directory}/**/product_details.html"].each_slice(100) do |filenames|
   json_file = Pathname("#{json_dir}/product_details_#{json_file_no}.json")
-  puts "正在生成 #{json_file.to_path}..."
+  puts "正在生成 #{json_file.to_path} ..."
   ary = []
 
   filenames.each do |filename|
