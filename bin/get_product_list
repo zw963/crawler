@@ -36,7 +36,7 @@ def capture
         detail_page_url = search_page_product_detail_url + id.to_s
         detail_page_url = detail_page_url.concat('.html') unless detail_page_url =~ /\?/
 
-        product_dir = FileUtils.mkdir_p("#{keyword_directory}/#{name}").first
+        product_dir = FileUtils.mkdir_p("#{$keyword_directory}/#{name}").first
 
         unless name.empty?
           `echo #{id} > "#{product_dir}"/id`
@@ -60,13 +60,9 @@ end
 require_relative '../lib/common'
 include Common
 
-unless test 's', "#{home_directory}/config/keywords.txt"
-  logger_with_puts '分类关键字文件 keywords.txt 不存在或者为空, 请首先编辑该文件.'
-  exit
-end
-
 begin
   $keyword = ENV['CRAWLER_KEYWORD']
+  $keyword_directory = ENV['CRAWLER_KEYWORD_DIRECTORY']
   load_site_info
   catch(:exit_capture) { capture }
 ensure

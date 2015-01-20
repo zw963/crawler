@@ -3,7 +3,8 @@
 /vendor
 /.bundle
 /lists
-keywords.txt
+keywords.yml
+keywords.yml.*
 /京东
 /天猫*
 /json

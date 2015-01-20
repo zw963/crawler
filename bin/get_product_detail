@@ -5,9 +5,12 @@ include Common
 
 def extract_info(detail_html)
   file = File.open(detail_html)
-  $keyword = File.basename(File.expand_path("../..", detail_html))
-  name = File.basename(File.expand_path("../", detail_html))
   product_origin_url = file.readline.chomp
+
+  path = Pathname(detail_html)
+  $keyword = path.parent.parent.basename.to_s
+  name = path.parent.basename.to_s
+  $keyword_directory = path.parent.parent.realpath.to_s
   load_site_info
 
   content = Nokogiri.HTML(File.read(file))
@@ -32,7 +35,7 @@ def extract_info(detail_html)
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
 ").map {|x| x.attr('src') }.uniq
-  local_images_url_ary = images_url_ary.map {|f| "#{keyword_directory}/#{name}/#{File.basename(f)}" }
+  local_images_url_ary = images_url_ary.map {|f| "#{$keyword_directory}/#{name}/#{File.basename(f)}" }
 
   details_hash.merge!(specs_hash).merge!({
       '原始商品id' => id,

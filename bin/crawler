@@ -1,10 +1,49 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-keywords_file = File.expand_path('../../config/keywords.txt', __FILE__)
-current_directory = File.expand_path('..', __FILE__)
+require_relative '../lib/common'
+include Common
+require 'yaml'
 
-File.foreach(keywords_file).map(&:chomp).reject {|x| x.empty? }.each do |keyword|
-  ENV['CRAWLER_KEYWORD'] = keyword
-  system "#{current_directory}/rename_space && #{current_directory}/get_product_list && #{current_directory}/download_product_detail"
+keyword_yml = "#{home_directory}/config/keywords.yml"
+
+unless test 's', keyword_yml
+  logger_with_puts '分类关键字文件 keywords.yml 不存在或者为空, 请首先编辑该文件.'
+  exit
+end
+
+content = YAML.load_file(keyword_yml)
+$keywords = []
+
+def create_directory(key)
+  if key.is_a? Array
+    dir = "#{key[0].tr('/', "\uff0f")}"
+    FileUtils.mkdir_p dir
+    key[1].each do |key|
+      Dir.chdir(dir) do
+        create_directory(key)
+      end
+    end
+  else
+    keyword = "#{key.tr('/', "\uff0f")}"
+    FileUtils.mkdir_p keyword
+    $keywords << [keyword, Pathname(keyword).realpath]
+  end
+end
+
+FileUtils.mkdir_p "#{home_directory}/天猫"
+
+content.each do |key|
+  Dir.chdir("#{home_directory}/天猫") do
+    create_directory(key)
+  end
+end
+
+keywords = $keywords.uniq {|e| e[0].strip }.to_h
+
+keywords.each do |k, v|
+  ENV['CRAWLER_KEYWORD'] = k
+  ENV['CRAWLER_KEYWORD_DIRECTORY'] = v.to_path
+
+  system "#{__dir__}/rename_space && #{__dir__}/get_product_list && #{__dir__}/download_product_detail"
 end

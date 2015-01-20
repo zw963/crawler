@@ -82,10 +82,6 @@ module Common
     keyword_name.tr(' ', "\u00a0").tr('$', "\ufe69").tr('&', "\uff06").tr('-', "\uff0d")
   end
 
-  def keyword_directory
-    "#{site_directory}/#{keyword_name}"
-  end
-
   def logger
     logger = eval("$#{keyword_symbol}_logger")
 
@@ -137,7 +133,7 @@ module Common
   end
 
   def keyword_csv_filename
-    keyword_csv_filename = "#{keyword_directory}.csv"
+    keyword_csv_filename = "#{$keyword_directory}.csv"
 
     if test 's', keyword_csv_filename
       logger_with_puts "\033[0;33m#{keyword_csv_filename}\033[0m 文件存在, 跳过 !"
