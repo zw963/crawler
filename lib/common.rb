@@ -71,7 +71,7 @@ module Common
       1
     else
       pages_count = element.text[/\d+/].to_i
-      logger_with_puts "当前分类: \033[0;33m#$keyword\033[0m, 报告页面总数: #{pages_count}."
+      logger_with_puts "当前分类: \033[0;33m#{keyword_with_category}\033[0m, 报告页面总数: #{pages_count}."
       pages_count
     end
   end
