@@ -33,12 +33,16 @@ module Common
     end
   end
 
+  def keyword_with_category
+    "#{$keyword} #{ENV['CRAWLER_KEYWORD_CATEGORY']}"
+  end
+
   def escaped_utf8_keyword
-    CGI.escape($keyword)
+    CGI.escape(keyword_with_category)
   end
 
   def escaped_gbk_keyword
-    CGI.escape($keyword.encode('gb2312', 'utf-8'))
+    CGI.escape(keyword_with_category.encode('gb2312', 'utf-8'))
   end
 
   def log_name

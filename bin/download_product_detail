@@ -64,7 +64,7 @@ def capture(file)
       product_details_file.close unless product_details_file.nil?
     end
   end
-  logger_with_puts "提取 \033[0;33m#$keyword\033[0m #{category}#{task} 完成."
+  logger_with_puts "提取 \033[0;33m#{keyword_with_category}\033[0m #{category}#{task} 完成."
 end
 
 unless ARGV.empty?
