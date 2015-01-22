@@ -11,6 +11,8 @@ def extract_info(detail_html)
   $keyword = path.parent.parent.basename.to_s
   name = path.parent.basename.to_s
   $keyword_directory = path.parent.parent.realpath.to_s
+  keyword_category = path.parent.parent.parent.realpath.basename.to_s.tr("\uff0f", "/")
+
   load_site_info
 
   content = Nokogiri.HTML(File.read(file))
@@ -41,6 +43,7 @@ def extract_info(detail_html)
       '原始商品id' => id,
       '商品名称' => product_name,
       '图片来源' => ENV['CRAWLER_SITE'],
+      '分类' => keyword_category,
       '价格' => price,
       '平均价格' => average_price,
       '商品原始链接' => product_origin_url,
