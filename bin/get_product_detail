@@ -60,6 +60,10 @@ json_dir = "#{home_directory}/json"
 FileUtils.mkdir_p json_dir
 FileUtils.rm Dir["#{json_dir}/product_details_*.json"] unless Dir["#{json_dir}/product_details_*.json"].empty?
 
+content = YAML.load_file("#{home_directory}/config/keywords.yml")
+puts "正在生成 #{json_dir}/categories.json ..."
+File.write("#{json_dir}/categories.json", content.to_json)
+
 product_counter = 0
 image_counter = 0
 json_file_no = 1

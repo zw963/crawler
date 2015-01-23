@@ -13,8 +13,6 @@ unless test 's', keyword_yml
 end
 
 content = YAML.load_file(keyword_yml)
-File.write("#{home_directory}/json/categories.json", content.to_json)
-
 $keywords = []
 
 def create_directory(key)
