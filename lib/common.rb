@@ -84,6 +84,7 @@ module Common
 
   def keyword_symbol
     keyword_name.tr(' ', "\u00a0").tr('$', "\ufe69").tr('&', "\uff06").tr('-', "\uff0d")
+      .tr('(', '（').tr(')', '）')
   end
 
   def logger
@@ -118,22 +119,14 @@ module Common
   end
 
   def search_page_content
-    content = instance_variable_get(:"@#{keyword_symbol}_search_page_content")
-    return content unless content.nil?
-
-    begin
-      browser.reset!
-      browser.goto(search_page_url_with_pagination + '1')
-      content = Nokogiri::HTML(browser.html)
-      if content.blank?
-        raise SocketError
-      else
-        instance_variable_set(:"@#{keyword_symbol}_search_page_content", content)
-      end
-    rescue SocketError, Net::ReadTimeout
-      logger_with_puts $!.message, :error
-      retry
-    end
+    browser.reset!
+    browser.goto(search_page_url_with_pagination + '1')
+    content = Nokogiri::HTML(browser.html)
+    raise SocketError if content.blank?
+    content
+  rescue SocketError, Net::ReadTimeout
+    logger_with_puts $!.message, :error
+    retry
   end
 
   def keyword_csv_filename
