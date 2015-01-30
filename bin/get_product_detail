@@ -11,7 +11,8 @@ def extract_info(detail_html)
   path = Pathname(detail_html)
   $keyword = path.parent.parent.basename.to_s
   name = path.parent.basename.to_s
-  $keyword_directory = path.parent.parent.realpath.basename.to_s.tr("\uff0f", "/")
+  $keyword_directory = path.parent.parent.realpath
+  product_category = $keyword_directory.basename.to_s.tr("\uff0f", "/")
 
   load_site_info
 
@@ -43,7 +44,7 @@ def extract_info(detail_html)
       '商品来源' => ENV['CRAWLER_SITE'],
       '商品原始id' => id,
       '商品名称' => product_name,
-      '产品分类' => $keyword_directory,
+      '产品分类' => product_category,
       '价格' => price,
       '平均价格' => average_price,
       '商品原始链接' => product_origin_url,
@@ -55,6 +56,8 @@ rescue
   logger_with_puts "创建 json 文件失败. 查看 #{product_origin_url} 了解详细信息.", :error
   raise
 end
+
+start_time = Time.now
 
 json_dir = "#{home_directory}/json"
 FileUtils.mkdir_p json_dir
@@ -87,3 +90,4 @@ Dir["#{site_directory}/**/product_details.html"].each_slice(100) do |filenames|
 end
 
 logger_with_puts "创建 json 完成, 产品数量: #{product_counter}, 图片数量: #{image_counter}."
+puts "spend time: \033[1;49m\033[0;33m#{"%d mintue %d seconds" % ((Time.now - start_time).divmod(60))}\033[0m.\n"
