@@ -11,7 +11,7 @@ def extract_info(detail_html)
   path = Pathname(detail_html)
   $keyword = path.parent.parent.basename.to_s
   name = path.parent.basename.to_s
-  $keyword_directory = path.parent.parent.realpath.to_s.tr("\uff0f", "/")
+  $keyword_directory = path.parent.parent.realpath.basename.to_s.tr("\uff0f", "/")
 
   load_site_info
 
