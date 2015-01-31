@@ -41,8 +41,7 @@ def extract_info(detail_html)
   local_images_url_ary = images_url_ary.map {|f| "#{$keyword_directory}/#{name}/#{File.basename(f)}" }
 
   details_hash.merge!(specs_hash).merge!({
-      '商品来源' => ENV['CRAWLER_SITE'],
-      '商品原始id' => id,
+      '商品来源信息' => "#{id}_#{ENV['CRAWLER_SITE']}",
       '商品名称' => product_name,
       '产品分类' => product_category,
       '价格' => price,
