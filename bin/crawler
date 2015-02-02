@@ -25,9 +25,9 @@ def create_directory(key)
       end
     end
   else
-    dir = "#{key.tr('/', "\uff0f")}"
-    FileUtils.mkdir_p dir
-    $keywords << [key, Pathname(dir).realpath]
+    dir = Pathname("#{key.tr('/', "\uff0f")}").expand_path
+    dir.mkpath
+    $keywords << ["#{key} #{dir.parent.basename.to_s.tr("\uff0f", '/')}", dir.to_s]
   end
 end
 
@@ -43,8 +43,7 @@ keywords = $keywords.uniq {|e| e[0].strip }.to_h
 
 keywords.each do |k, v|
   ENV['CRAWLER_KEYWORD'] = k
-  ENV['CRAWLER_KEYWORD_DIRECTORY'] = v.to_s
-  ENV['CRAWLER_KEYWORD_CATEGORY'] = v.parent.basename.to_s.tr("\uff0f", '/')
+  ENV['CRAWLER_KEYWORD_DIRECTORY'] = v
 
   system "#{__dir__}/rename_space && #{__dir__}/get_product_list && #{__dir__}/download_product_detail"
 end

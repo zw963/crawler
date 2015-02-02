@@ -14,6 +14,7 @@
   product_id_xpath: //li[@sku]
   product_page_product_name_css:
   product_page_product_price_css:
+  product_page_product_promotional_price_css:
   product_page_product_average_price_css:
   product_page_detail_list_css: div#product-detail-1 ul.detail-list li
   product_page_little_image_lists_expression: 'div(id: "spec-list").div(class: "spec-items").ul(class: "lh").lis'
@@ -29,6 +30,7 @@
   product_id_xpath: //div[@data-id]
   product_page_product_name_css: div.tb-detail-hd h1
   product_page_product_price_css: dl#J_StrPriceModBox dd span.tm-price
+  product_page_product_promotional_price_css: dl#J_PromoPrice dd span.tm-price
   product_page_product_average_price_css: dl#J_StrPriceModBox dd span.tm-price-item
   product_page_detail_list_css: ul#J_AttrUL li
   product_page_little_image_lists_expression: 'ul(id: "J_UlThumb").lis'

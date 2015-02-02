@@ -21,6 +21,7 @@ def extract_info(detail_html)
   id = File.read(File.expand_path("../id", detail_html)).chomp
   product_name = content.css(product_page_product_name_css).first.text.strip.tr_s(' ', ' ') rescue ''
   price = content.css(product_page_product_price_css).first.text.tr('[¥$]', '') rescue ''
+  promotional_price = content.css(product_page_product_promotional_price_css).first.text.tr('[¥$]', '') rescue ''
   average_price = content.css(product_page_product_average_price_css).first.text rescue ''
   details_ary = content.css(product_page_detail_list_css)
     .map {|e| e.text.split(/：|:/) }
@@ -45,6 +46,7 @@ def extract_info(detail_html)
       '商品名称' => product_name,
       '产品分类' => product_category,
       '价格' => price,
+      '促销价格' => promotional_price,
       '平均价格' => average_price,
       '商品原始链接' => product_origin_url,
       '图片原始链接' => images_url_ary,

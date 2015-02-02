@@ -33,16 +33,12 @@ module Common
     end
   end
 
-  def keyword_with_category
-    "#{$keyword} #{ENV['CRAWLER_KEYWORD_CATEGORY']}"
-  end
-
   def escaped_utf8_keyword
-    CGI.escape(keyword_with_category)
+    CGI.escape($keyword)
   end
 
   def escaped_gbk_keyword
-    CGI.escape(keyword_with_category.encode('gb2312', 'utf-8'))
+    CGI.escape($keyword.encode('gb2312', 'utf-8'))
   end
 
   def log_name
@@ -71,7 +67,7 @@ module Common
       1
     else
       pages_count = element.text[/\d+/].to_i
-      logger_with_puts "当前分类: \033[0;33m#{keyword_with_category}\033[0m, 报告页面总数: #{pages_count}."
+      logger_with_puts "当前分类: \033[0;33m#$keyword\033[0m, 报告页面总数: #{pages_count}."
       pages_count
     end
   end
