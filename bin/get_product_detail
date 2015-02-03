@@ -67,6 +67,9 @@ content = YAML.load_file("#{home_directory}/config/keywords.yml")
 puts "正在生成 #{json_dir}/categories.json ..."
 File.write("#{json_dir}/categories.json", content.to_json)
 
+require 'thread'
+lock = Mutex.new
+
 product_counter = 0
 image_counter = 0
 
@@ -85,8 +88,10 @@ Dir["#{site_directory}/**/product_details.html"].each_slice(100) do |filenames|
 
       ary << info_hash
 
-      # product_counter += 1
-      # image_counter += images_count
+      lock.synchronize do
+        product_counter += 1
+        image_counter += images_count
+      end
 
     end
     json_file.write(JSON.fast_generate(ary))
@@ -95,5 +100,5 @@ end
 
 threads.each(&:join)
 
-# logger_with_puts "创建 json 完成, 产品数量: #{product_counter}, 图片数量: #{image_counter}."
+logger_with_puts "创建 json 完成, 产品数量: #{product_counter}, 图片数量: #{image_counter}."
 puts "spend time: \033[1;49m\033[0;33m#{"%d mintue %d seconds" % ((Time.now - start_time).divmod(60))}\033[0m.\n"
