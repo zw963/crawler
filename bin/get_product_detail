@@ -80,7 +80,7 @@ Dir["#{site_directory}/**/product_details.html"].each_slice(100) do |filenames|
     ary = []
 
     current_thread_id = Thread.current.object_id
-    current_time = Time.now.strftime("%s")
+    current_time = Time.now.strftime("%s%N")
     json_file = Pathname("#{json_dir}/product_details_#{current_thread_id}_#{current_time}.json")
     puts "正在生成 #{json_file} ..."
     filenames.each do |filename|
@@ -95,6 +95,7 @@ Dir["#{site_directory}/**/product_details.html"].each_slice(100) do |filenames|
 
     end
     json_file.write(JSON.fast_generate(ary))
+    puts "#{json_file} 创建成功."
   end
 end
 
