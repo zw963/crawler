@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 def capture(file)
-  logger.info "正在打开 #{$keyword} #{category}页面."
+  logger.info "正在打开 #{keyword} #{category}页面."
 
   amount_ary = CSV.readlines(file)
   amount = amount_ary.count
@@ -11,7 +11,7 @@ def capture(file)
   list = amount_ary.each do |csv_array|
     name = csv_array[1]
     detail_url = csv_array[2]
-    directory = "#{$keyword_directory}/#{name}"
+    directory = "#{keyword_directory}/#{name}"
     product_details_filename = "#{directory}/product_details.html"
 
     if test ?s, product_details_filename
@@ -64,7 +64,7 @@ def capture(file)
       product_details_file.close unless product_details_file.nil?
     end
   end
-  logger_with_puts "提取 \033[0;33m#$keyword\033[0m #{category}#{task} 完成."
+  logger_with_puts "提取 \033[0;33m#{keyword}\033[0m #{category}#{task} 完成."
 end
 
 unless ARGV.empty?
@@ -76,19 +76,19 @@ require_relative '../lib/common'
 include Common
 
 begin
-  $keyword = ENV['CRAWLER_KEYWORD']
-  $keyword_directory = ENV['CRAWLER_KEYWORD_DIRECTORY']
+  Thread.current['keyword'] = ENV['CRAWLER_KEYWORD']
+  Thread.current['keyword_directory'] = ENV['CRAWLER_KEYWORD_DIRECTORY']
 
   load_site_info
 
-  csv = "#{$keyword_directory}.csv"
+  csv = "#{keyword_directory}.csv"
 
   unless test ?s, csv
     logger_with_puts "#{csv} 不存在! 跳过产品细节提取."
     exit 1
   end
 
-  capture("#{$keyword_directory}.csv")
+  capture("#{keyword_directory}.csv")
 ensure
   browser.close unless @browser.nil?
 end

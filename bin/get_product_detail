@@ -8,10 +8,10 @@ def extract_info(detail_html)
   product_origin_url = file.readline.chomp
 
   path = Pathname(detail_html)
-  $keyword = path.parent.parent.basename.to_s
+  Thread.current['keyword'] = path.parent.parent.basename.to_s
   name = path.parent.basename.to_s
-  $keyword_directory = path.parent.parent.realpath
-  product_category = $keyword_directory.basename.to_s.tr("\uff0f", "/")
+  keyword_directory = path.parent.parent.realpath
+  product_category = keyword_directory.basename.to_s.tr("\uff0f", "/")
 
   load_site_info
 
@@ -38,7 +38,7 @@ def extract_info(detail_html)
 |
 //div[contains(@class, \"#{product_page_float_image_id}\")]/img
 ").map {|x| x.attr('src') }.uniq
-  local_images_url_ary = images_url_ary.map {|f| "#{$keyword_directory}/#{name}/#{File.basename(f)}" }
+  local_images_url_ary = images_url_ary.map {|f| "#{keyword_directory}/#{name}/#{File.basename(f)}" }
 
   details_hash.merge!(specs_hash).merge!({
       '商品来源信息' => "#{id}_#{ENV['CRAWLER_SITE']}",

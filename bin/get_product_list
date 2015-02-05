@@ -36,7 +36,7 @@ def capture
         detail_page_url = search_page_product_detail_url + id.to_s
         detail_page_url = detail_page_url.concat('.html') unless detail_page_url =~ /\?/
 
-        product_dir = FileUtils.mkdir_p("#{$keyword_directory}/#{name}").first
+        product_dir = FileUtils.mkdir_p("#{keyword_directory}/#{name}").first
 
         unless name.empty?
           `echo #{id} > "#{product_dir}"/id`
@@ -48,7 +48,7 @@ def capture
     end
     logger_with_puts "已抓取第 #{page_counter += 1} 页."
   end
-  logger_with_puts "\033[0;33m#$keyword\033[0m #{category}#{task} 抓取完成, 抓取数量为: #{product_counter}."
+  logger_with_puts "\033[0;33m#{keyword}\033[0m #{category}#{task} 抓取完成, 抓取数量为: #{product_counter}."
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."
@@ -61,8 +61,8 @@ require_relative '../lib/common'
 include Common
 
 begin
-  $keyword = ENV['CRAWLER_KEYWORD']
-  $keyword_directory = ENV['CRAWLER_KEYWORD_DIRECTORY']
+  Thread.current['keyword'] = ENV['CRAWLER_KEYWORD']
+  Thread.current['keyword_directory'] = ENV['CRAWLER_KEYWORD_DIRECTORY']
   load_site_info
   catch(:exit_capture) { capture }
 ensure
