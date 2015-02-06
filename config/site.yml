@@ -1,9 +1,3 @@
-文件名映射:
-  product: 产品
-  image: 图片
-  detail: 信息
-  list: 列表
-  downloader: 下载器
 京东:
   search_page_url_with_pagination: http://search.jd.com/Search?keyword=<%= escaped_utf8_keyword %>&enc=utf-8&page=
   search_page_product_amount_css: div.total span strong

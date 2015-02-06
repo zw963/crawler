@@ -48,7 +48,7 @@ def capture
     end
     logger_with_puts "已抓取第 #{page_counter += 1} 页."
   end
-  logger_with_puts "\033[0;33m#{keyword}\033[0m #{category}#{task} 抓取完成, 抓取数量为: #{product_counter}."
+  logger_with_puts "\033[0;33m#{keyword}\033[0m 产品列表 抓取完成, 抓取数量为: #{product_counter}."
 ensure
   unless csv_file.nil?
     logger.info "正在关闭 #{csv_file.path}."

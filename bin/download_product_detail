@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 def capture(file)
-  logger.info "正在打开 #{keyword} #{category}页面."
+  logger.info "正在打开 #{keyword} 产品页面."
 
   amount_ary = CSV.readlines(file)
   amount = amount_ary.count
@@ -64,7 +64,7 @@ def capture(file)
       product_details_file.close unless product_details_file.nil?
     end
   end
-  logger_with_puts "提取 \033[0;33m#{keyword}\033[0m #{category}#{task} 完成."
+  logger_with_puts "提取 \033[0;33m#{keyword}\033[0m 产品细节 完成."
 end
 
 unless ARGV.empty?

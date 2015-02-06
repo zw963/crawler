@@ -18,7 +18,7 @@ class KeywordLogger
       eval "Thread.current['#{keyword_symbol}_logger'] = logger"
     end
 
-    logger.info "开始抓取 \033[0;33m#{keyword}\033[0m #{category}#{task}."
+    logger.info "开始抓取 \033[0;33m#{keyword}\033[0m 产品#{task}."
 
     logger
   end
