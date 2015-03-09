@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd $(dirname `which $0`)
+find '天猫' -name 'product_details.html' -size 0k -exec rm -v {} +

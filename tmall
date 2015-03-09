@@ -2,4 +2,7 @@
 
 export CRAWLER_SITE=天猫
 
-$(dirname `which $0`)/bin/crawler
+cd $(dirname `which $0`)
+clean_empty_html
+bin/crawler
+clean_empty_html
