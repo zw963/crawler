@@ -11,7 +11,9 @@ def extract_info(detail_html)
   Thread.current['keyword'] = path.parent.parent.basename.to_s
   name = path.parent.basename.to_s
   keyword_directory = path.parent.parent.realpath
+  category_directory = keyword_directory.parent
   product_category = keyword_directory.basename.to_s.tr("\uff0f", "/")
+  product_parent_category = category_directory.basename.to_s.tr("\uff0f", "/")
 
   load_site_info
 
@@ -44,12 +46,13 @@ def extract_info(detail_html)
       '商品来源信息' => "#{id}_#{ENV['CRAWLER_SITE']}",
       '商品名称' => product_name,
       '产品分类' => product_category,
+      '产品父分类' => product_parent_category,
       '价格' => price,
       '促销价格' => promotional_price,
       '平均价格' => average_price,
       '商品原始链接' => product_origin_url,
       '图片原始链接' => images_url_ary,
-      '图片本地链接' => local_images_url_ary
+      '图片本地链接' => local_images_url_ary,
     })
   [details_hash, images_url_ary.count]
 rescue
